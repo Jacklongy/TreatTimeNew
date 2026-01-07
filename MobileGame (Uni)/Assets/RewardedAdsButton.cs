@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Advertisements;
+using System.Collections;
 
 public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
@@ -8,6 +9,10 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     [SerializeField] string _androidAdUnitId = "Rewarded_Android";
     //[SerializeField] string _iOSAdUnitId = "Rewarded_iOS";
     string _adUnitId = null; // This will remain null for unsupported platforms
+
+    [SerializeField] private int maxRetries = 3;
+    [SerializeField] private float retryDelay = 2f;
+    private int currentRetryCount = 0;
 
     DogFeeder dog;
 
@@ -18,6 +23,8 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
         _adUnitId = _iOSAdUnitId;
 #elif UNITY_ANDROID
         _adUnitId = _androidAdUnitId;
+#elif UNITY_EDITOR
+        _adUnitId = _androidAdUnitId; // Use Android ID for testing in Editor
 #endif
 
         // Disable the button until the ad is ready to show:
@@ -28,6 +35,13 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     public void LoadAd()
     {
         // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
+        if (string.IsNullOrEmpty(_adUnitId))
+        {
+            Debug.LogWarning("Ad Unit ID not set for this platform. Ads not available.");
+            return;
+        }
+
+        currentRetryCount = 0;
         Debug.Log("Loading Ad: " + _adUnitId);
         Advertisement.Load(_adUnitId, this);
     }
@@ -43,6 +57,7 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
             _showAdButton.onClick.AddListener(ShowAd);
             // Enable the button for users to click:
             _showAdButton.interactable = true;
+            currentRetryCount = 0; // Reset retry count on success
         }
     }
 
@@ -64,10 +79,23 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
 
             dog = FindObjectOfType<DogFeeder>(); 
 
-            dog.AdReward(true);
+            if (dog != null)
+            {
+                dog.AdReward(true);
+            }
+            else
+            {
+                Debug.LogWarning("DogFeeder not found in scene!");
+            }
 
             _showAdButton.interactable = true;
             // Grant a reward.
+        }
+        else
+        {
+            // Ad was skipped or closed
+            Debug.Log("Rewarded ad was not completed.");
+            _showAdButton.interactable = true;
         }
     }
 
@@ -75,13 +103,43 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
     {
         Debug.Log($"Error loading Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+
+        if (adUnitId.Equals(_adUnitId))
+        {
+            if (currentRetryCount < maxRetries)
+            {
+                currentRetryCount++;
+                Debug.Log($"Retrying ad load ({currentRetryCount}/{maxRetries}) after {retryDelay} seconds...");
+                StartCoroutine(RetryLoadAd());
+            }
+            else
+            {
+                Debug.LogError($"Failed to load ad after {maxRetries} attempts. Button will remain disabled.");
+                _showAdButton.interactable = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Coroutine to retry loading the ad after a delay
+    /// </summary>
+    private IEnumerator RetryLoadAd()
+    {
+        yield return new WaitForSeconds(retryDelay);
+        Debug.Log("Retrying ad load...");
+        Advertisement.Load(_adUnitId, this);
     }
 
     public void OnUnityAdsShowFailure(string adUnitId, UnityAdsShowError error, string message)
     {
         Debug.Log($"Error showing Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+        
+        if (adUnitId.Equals(_adUnitId))
+        {
+            _showAdButton.interactable = true;
+            // Try to load another ad
+            LoadAd();
+        }
     }
 
     public void OnUnityAdsShowStart(string adUnitId) { }
@@ -91,6 +149,7 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     {
         // Clean up the button listeners:
         _showAdButton.onClick.RemoveAllListeners();
+        StopAllCoroutines();
     }
 
     private void OnEnable()

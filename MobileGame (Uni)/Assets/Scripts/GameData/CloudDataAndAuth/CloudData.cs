@@ -9,6 +9,9 @@ public class CloudData : MonoBehaviour
 {
     public static CloudData instance;
 
+    private bool isInitialized = false;
+    private TaskCompletionSource<bool> initializationTask;
+
     /// <summary>
     /// Make sure there is only one instance of cloud save. 
     /// </summary>
@@ -23,6 +26,7 @@ public class CloudData : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
+        initializationTask = new TaskCompletionSource<bool>();
     }
 
 
@@ -31,7 +35,55 @@ public class CloudData : MonoBehaviour
     /// </summary>
     public async void Start()
     {
-        await UnityServices.InitializeAsync();
+        await InitializeAsync();
+    }
+
+    /// <summary>
+    /// Properly initialize cloud services and wait for completion
+    /// </summary>
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            if (UnityServices.State != ServicesInitializationState.Initialized)
+            {
+                Debug.Log("Initializing Unity Cloud Services...");
+                await UnityServices.InitializeAsync();
+                Debug.Log("Cloud Services initialized successfully.");
+            }
+            else
+            {
+                Debug.Log("Cloud Services already initialized.");
+            }
+
+            isInitialized = true;
+            initializationTask.TrySetResult(true);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to initialize Cloud Services: " + e.Message);
+            isInitialized = false;
+            initializationTask.TrySetException(e);
+        }
+    }
+
+    /// <summary>
+    /// Wait for cloud services to be ready before attempting to save/load
+    /// </summary>
+    private async Task EnsureInitialized()
+    {
+        if (isInitialized)
+            return;
+
+        try
+        {
+            await initializationTask.Task;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Cloud initialization failed: " + e.Message);
+            throw;
+        }
     }
 
     /// <summary>
@@ -39,12 +91,21 @@ public class CloudData : MonoBehaviour
     /// Example: Coins - 5. 
     /// </summary>
     /// <param name="key"> Key to refer and find the data. Its name. e.g Coins </param>
-    /// <param name="test"> The Value to hold. E.g Int. </param>
-    public async void SaveData(string key, object test)
+    /// <param name="value"> The Value to hold. E.g Int. </param>
+    public async void SaveData(string key, object value)
     {
-        var data = new Dictionary<string, object> { { key, test} };
+        try
+        {
+            await EnsureInitialized();
 
-        await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+            var data = new Dictionary<string, object> { { key, value } };
+            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+            Debug.Log($"Cloud data saved - {key}: {value}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to save cloud data ({key}): " + e.Message);
+        }
     }
 
 
@@ -53,12 +114,25 @@ public class CloudData : MonoBehaviour
     // it can be any data type also. you just specify it when you reference this function. 
     public async Task<T> LoadData<T>(string key)
     {
-        var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
-        if (playerData.TryGetValue(key, out var keyName) && playerData != null)
+        try
         {
-            return keyName.Value.GetAs<T>();
+            await EnsureInitialized();
+
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+            if (playerData.TryGetValue(key, out var keyName) && playerData != null)
+            {
+                Debug.Log($"Cloud data loaded - {key}: {keyName.Value.GetAs<T>()}");
+                return keyName.Value.GetAs<T>();
+            }
+
+            Debug.LogWarning($"Cloud data key not found: {key}");
+            return default;
         }
-        return default;
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to load cloud data ({key}): " + e.Message);
+            return default;
+        }
     }
 
     /// <summary>
@@ -66,10 +140,19 @@ public class CloudData : MonoBehaviour
     /// </summary>
     public async void ListKeys()
     {
-        var keys = await CloudSaveService.Instance.Data.Player.ListAllKeysAsync();
-        for (int i = 0; i < keys.Count; i++)
+        try
         {
-            Debug.Log(keys[i].Key);
+            await EnsureInitialized();
+
+            var keys = await CloudSaveService.Instance.Data.Player.ListAllKeysAsync();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                Debug.Log(keys[i].Key);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to list cloud keys: " + e.Message);
         }
     }
 }

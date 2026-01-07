@@ -24,6 +24,8 @@ public class PlayerData
    
     public int HighScoreTimed;
     public int HighScoreUnlim;
+    
+    public bool Vibrations;
 
     /// <summary>
     /// Sets the data = to the data from game overseer, which comunicates with the treat time game. 
@@ -32,6 +34,7 @@ public class PlayerData
     /// <param name="gameOverseer"></param>
     public PlayerData(GameOverseer gameOverseer)
     {
+        DogName = gameOverseer.DogName;
         Coins = gameOverseer.Coins;
         TotalXP = gameOverseer.TotalXP;
         PreviousLvlXP = gameOverseer.PreviousLvlXP;
@@ -39,6 +42,13 @@ public class PlayerData
         CurrentLevel = gameOverseer.CurrentLevel;
         hasPlayed = gameOverseer.hasPlayed;
         HighScoreTimed = gameOverseer.HighScoreTimed;
+        Gems = gameOverseer.Gems;
+        PlayerRep = gameOverseer.PlayerRep;
+        Vibrations = gameOverseer.Vibrations;
     }
 
+    /// <summary>
+    /// Parameterless constructor for JSON deserialization.
+    /// </summary>
+    public PlayerData() { }
 }

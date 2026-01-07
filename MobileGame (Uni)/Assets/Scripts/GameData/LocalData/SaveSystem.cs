@@ -1,51 +1,82 @@
 using UnityEngine;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System;
 
 public static class SaveSystem
 {
-   public static void Save(GameOverseer overseer)
+    private static string GetSavePath() => Path.Combine(Application.persistentDataPath, "Player.json");
+
+    public static void Save(GameOverseer overseer)
     {
-        BinaryFormatter formatter = new BinaryFormatter();
+        try
+        {
+            PlayerData data = new PlayerData(overseer);
+            string json = JsonUtility.ToJson(data, true); // true = pretty print for debugging
+            string path = GetSavePath();
 
-        string path = Application.persistentDataPath + "/Player.Data";
-
-        FileStream stream = new FileStream(path, FileMode.Create);
-
-        PlayerData data = new PlayerData(overseer);
-
-        Debug.Log("Save file created at: " + path);
-
-
-        formatter.Serialize(stream, data);
-        stream.Close();
+            File.WriteAllText(path, json);
+            Debug.Log("Save file created at: " + path);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Failed to save game data: " + e.Message);
+        }
     }
 
     public static PlayerData LoadData()
     {
-        string path = Application.persistentDataPath + "/Player.Data";
-
-        if (File.Exists(path))
+        try
         {
+            string path = GetSavePath();
 
-            BinaryFormatter formatter = new BinaryFormatter(); 
-            FileStream fileStream = new FileStream(path, FileMode.Open);
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                PlayerData data = JsonUtility.FromJson<PlayerData>(json);
 
-            PlayerData data = formatter.Deserialize(fileStream) as PlayerData;
-            fileStream.Close();
-
-            return data;
+                if (data != null)
+                {
+                    Debug.Log("Game data loaded successfully from: " + path);
+                    return data;
+                }
+                else
+                {
+                    Debug.LogError("Failed to deserialize player data. Save file may be corrupted.");
+                    return CreateDefaultData();
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Save file not found at path: " + path);
+                Debug.LogWarning("Persistent Data Path: " + Application.persistentDataPath);
+                return CreateDefaultData();
+            }
         }
-        else
+        catch (Exception e)
         {
-            Debug.LogError("Save file not found at path: " + path);
-            Debug.LogError("Persistent Data Path: " + Application.persistentDataPath);
-            return null;
-         
-          
+            Debug.LogError("Error loading game data: " + e.Message);
+            return CreateDefaultData();
         }
     }
 
-    
+    /// <summary>
+    /// Creates default data for new players to prevent null reference crashes.
+    /// </summary>
+    private static PlayerData CreateDefaultData()
+    {
+        return new PlayerData
+        {
+            DogName = "Default",
+            Coins = 0,
+            TotalXP = 0f,
+            CurrentLevel = 0,
+            PreviousLvlXP = 0f,
+            NextLevelXP = 30,
+            Gems = 0,
+            PlayerRep = 0f,
+            hasPlayed = 0,
+            HighScoreTimed = 0,
+            HighScoreUnlim = 0
+        };
+    }
 }

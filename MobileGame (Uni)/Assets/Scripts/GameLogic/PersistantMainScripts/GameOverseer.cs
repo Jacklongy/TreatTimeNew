@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 public class GameOverseer : MonoBehaviour
 {
     
-    GameOverseer instance;
+    static GameOverseer instance;
     public CloudData cloudData;
     public string DogName;
 
@@ -128,6 +128,13 @@ public class GameOverseer : MonoBehaviour
         // Where data is copied from here and used to be saved in the save system. 
         PlayerData data = SaveSystem.LoadData();
 
+        if (data == null)
+        {
+            Debug.LogError("Failed to load player data. Using default values.");
+            return;
+        }
+
+        DogName = data.DogName;
         Coins = data.Coins;
         TotalXP = data.TotalXP;
         PreviousLvlXP = data.PreviousLvlXP;
@@ -135,6 +142,9 @@ public class GameOverseer : MonoBehaviour
         CurrentLevel = data.CurrentLevel;
         hasPlayed = data.hasPlayed;
         HighScoreTimed = data.HighScoreTimed;
+        Gems = data.Gems;
+        PlayerRep = data.PlayerRep;
+        Vibrations = data.Vibrations;
     }
 
 

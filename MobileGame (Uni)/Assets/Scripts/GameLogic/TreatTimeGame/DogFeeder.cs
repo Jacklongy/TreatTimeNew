@@ -17,7 +17,7 @@ public class DogFeeder : MonoBehaviour
     [Header("Displays")]
     public GameObject display;
     public TextMeshProUGUI MealCountDisplay;
-    public TextMeshProUGUI TimerDisplay;
+    public Image HungerBar; // Drag your hunger bar Image here
 
     [Header("Menus")]
     public GameObject Quit;
@@ -56,8 +56,9 @@ public class DogFeeder : MonoBehaviour
 
     [Header("Timers")]
     bool timerPause;
-    public float StartTime = 300f;
-    public float currentime;
+    public float hungerLevel = 0.5f; // Starts at 50% hunger
+    public float hungerDecayRate = 0.15f; // How fast hunger depletes per second
+    public float hungerGainPerMeal = 0.25f; // How much hunger increases per correct meal
     public float comboTimer;
 
     [Header("Stats this game")]
@@ -246,7 +247,8 @@ public class DogFeeder : MonoBehaviour
         HighScore = overseer.HighScoreTimed;
         hasPlayed = overseer.hasPlayed;
 
-        currentime = StartTime;
+        // Initialize hunger to middle (50%)
+        hungerLevel = 0.5f;
 
         comboTimer = 10f;
         comboAmount = 0;
@@ -290,6 +292,17 @@ public class DogFeeder : MonoBehaviour
     }
 
     /// <summary>
+    /// Update the hunger bar UI to reflect current hunger level
+    /// </summary>
+    private void UpdateHungerBar()
+    {
+        if (HungerBar != null)
+        {
+            HungerBar.fillAmount = hungerLevel;
+        }
+    }
+
+    /// <summary>
     ///  display a new food the dog wants when the player succesfully makes a meal. 
     /// </summary>
     void DisplayNewFood()
@@ -321,6 +334,8 @@ public class DogFeeder : MonoBehaviour
 
     void Update()
     {
+        // Update hunger bar UI every frame
+        UpdateHungerBar();
 
         // Manages the combo logic. 
         if (ComboStart == true)
@@ -355,35 +370,12 @@ public class DogFeeder : MonoBehaviour
         }
 
 
+        // Decrease hunger over time
         if (timerPause == false)
         {
-            currentime -= 1 * Time.deltaTime;
-
-            int seconds = ((int)currentime % 60);
-            int minutes = ((int)currentime / 60);
-
-            TimerDisplay.text = (string.Format("{0:00}:{1:00}", minutes, seconds));
+            hungerLevel -= hungerDecayRate * Time.deltaTime;
+            hungerLevel = Mathf.Clamp01(hungerLevel); // Keep between 0 and 1
         }
-
-        // Manages the count down, when the timer is below 10 seconds, change the color of timer to red. 
-        // And Play countdown music. 
-        if(currentime <= 10f)
-        {
-            if (countDownSound == true)
-            {
-                FindObjectOfType<SoundManagerScript>().Play("down");
-
-                countDownSound = false;
-            }
-           
-            TimerDisplay.color = Color.red;
-           
-        }
-        else
-        {
-            TimerDisplay.color = Color.white;
-        }
-
 
         // Show the current amount of meals. 
         MealCountDisplay.text = (mealCount.ToString());
@@ -391,8 +383,8 @@ public class DogFeeder : MonoBehaviour
         // Calculates the XP for the end of the game. 
         XPthisGame = mealCount * coinCount / 2;
 
-        // Trigger the add if the timer is 0.
-        if (currentime <= 0)
+        // Trigger the add if hunger reaches 0.
+        if (hungerLevel <= 0)
         {
             grab.NoPickUp = true;
 
@@ -502,7 +494,8 @@ public class DogFeeder : MonoBehaviour
 
                 timerPause = false;
 
-                currentime = 90f;
+                // Restore hunger to 50% after watching ad
+                hungerLevel = 0.5f;
 
                 ad_CoolDown += 1;
 
@@ -556,6 +549,9 @@ public class DogFeeder : MonoBehaviour
             // increase meal count. 
             mealCount++;
 
+            // Increase hunger when fed correctly (capped at 100%)
+            hungerLevel = Mathf.Min(hungerLevel + hungerGainPerMeal, 1f);
+
             // start the combo. 
             ComboStart = true;
 
@@ -584,12 +580,15 @@ public class DogFeeder : MonoBehaviour
         {
             coinCount -= 5;
 
+            // Slight hunger decrease on wrong food (5% penalty)
+            hungerLevel = Mathf.Max(hungerLevel - 0.05f, 0f);
+
             FindObjectOfType<SoundManagerScript>().Play("CantPlace");
             // play dog animation
             // coin pop up
 
             // pause timer
-            Debug.Log("-5 coins");
+            Debug.Log("-5 coins, hunger decreased");
         }
     }
 

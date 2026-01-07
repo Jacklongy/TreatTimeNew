@@ -4,120 +4,114 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// ItemSpawner manages global spawn settings.
+/// Items are spawned via ItemButton clicks onto the unified grid.
+/// Also handles the Board Clear (Shuffle) feature to help players reset when overwhelmed.
+/// </summary>
 public class ItemSpawner : MonoBehaviour
 {
-    // Item spawner will just replace the items when they have all been placed. 
-    // add random items good and bad. 
-    // add a suffle button
-
-    public GameObject BowlSlot;
-    public GameObject Bowl;
-    public GameObject[] ItemSlots;
-    public GameObject[] ItemsToSpawn;
-    GameObject itemSpawned;
-    public static int slotEmpty;
-    public int shuffleCount;
+    [Header("Board Clear System")]
+    public int shuffleCount = 5;
     public TextMeshProUGUI ShuffleDisplay;
-   
+    public Button ShuffleButton;
+
+    [Header("Grid Reference")]
+    private GridManager gridManager;
 
     private void Start()
     {
-        slotEmpty = 0;
+        gridManager = FindObjectOfType<GridManager>();
 
-        shuffleCount = 5;
-
-        IItemSlot bowlSlot = BowlSlot.GetComponent<IItemSlot>();
-
-        bowlSlot.SpawnItem(Bowl);
-
-        slotEmpty += 1;
-
-        foreach (var item in ItemSlots)
+        if (ShuffleButton != null)
         {
-            IItemSlot slot = item.GetComponent<IItemSlot>();
-
-            itemSpawned = ItemsToSpawn[Random.Range(0, ItemsToSpawn.Length)];
-
-            slot.SpawnItem(itemSpawned);
-
-            slotEmpty += 1;
-
+            ShuffleButton.onClick.AddListener(Shuffle);
         }
-    }
 
+        UpdateShuffleDisplay();
+    }
 
     private void Update()
     {
-    
-        if(slotEmpty == 0)
-        {
-            SpawnCheck();
-        }
-
+        // Clamp shuffle count to minimum 0
         if (shuffleCount < 0)
         {
             shuffleCount = 0;
         }
 
-        ShuffleDisplay.text = (shuffleCount.ToString());
-
+        UpdateShuffleDisplay();
     }
 
-    public void SpawnCheck()
+    /// <summary>
+    /// Update the shuffle count display
+    /// </summary>
+    private void UpdateShuffleDisplay()
     {
-
-        IItemSlot bowlSlot = BowlSlot.GetComponent<IItemSlot>();
-
-        bowlSlot.SpawnItem(Bowl);
-
-        slotEmpty += 1;
-
-        foreach (var item in ItemSlots)
+        if (ShuffleDisplay != null)
         {
-            IItemSlot slot = item.GetComponent<IItemSlot>();
-
-            itemSpawned = ItemsToSpawn[Random.Range(0, ItemsToSpawn.Length)];
-
-            slot.SpawnItem(itemSpawned);
-
-            slotEmpty += 1;
-
+            ShuffleDisplay.text = shuffleCount.ToString();
         }
     }
 
+    /// <summary>
+    /// Clear all items from the grid (Board Shuffle)
+    /// Allows player to reset and continue if overwhelmed or out of space
+    /// </summary>
     public void Shuffle()
     {
-        shuffleCount -= 1;
-
-        FindObjectOfType<SoundManagerScript>().Play("Shuffle");
-
-
-        if (shuffleCount >= 0)
+        if (shuffleCount <= 0)
         {
-            foreach (var item in ItemSlots)
+            Debug.LogWarning("No board clears remaining!");
+            return;
+        }
+
+        if (gridManager == null)
+        {
+            Debug.LogError("GridManager not found!");
+            return;
+        }
+
+        // Play sound effect
+        SoundManagerScript soundManager = FindObjectOfType<SoundManagerScript>();
+        if (soundManager != null)
+        {
+            soundManager.Play("Shuffle");
+        }
+
+        shuffleCount--;
+
+        // Get all occupied tiles
+        List<Tile> occupiedTiles = gridManager.GetAllOccupiedTiles();
+
+        Debug.Log($"Board Clear: Removing {occupiedTiles.Count} items from grid");
+
+        // Destroy all items on the grid
+        foreach (Tile occupiedTile in occupiedTiles)
+        {
+            if (occupiedTile.ObjectContainer != null)
             {
-                IItemSlot slot = item.GetComponent<IItemSlot>();
-
-                if (slot.CheckIfFull())
-                {
-                    slot.ShuffleItems();
-                }
-            }
-
-            foreach (var item in ItemSlots)
-            {
-                IItemSlot slot = item.GetComponent<IItemSlot>();
-
-                itemSpawned = ItemsToSpawn[Random.Range(0, ItemsToSpawn.Length)];
-
-                slot.SpawnItem(itemSpawned);
-
-                slotEmpty += 1;
-
+                GameObject itemToDestroy = occupiedTile.ObjectContainer;
+                occupiedTile.RemoveObject();
+                Destroy(itemToDestroy);
             }
         }
 
-      
+        // Visual/Audio feedback
+        if (soundManager != null)
+        {
+            soundManager.Play("CantPlace"); // Or another "clear" sound
+        }
+
+        Debug.Log("Board cleared! Player can now continue with fresh space");
+
+        UpdateShuffleDisplay();
     }
 
+    private void OnDestroy()
+    {
+        if (ShuffleButton != null)
+        {
+            ShuffleButton.onClick.RemoveListener(Shuffle);
+        }
+    }
 }
