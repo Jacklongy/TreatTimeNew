@@ -147,4 +147,33 @@ public class GridManager : MonoBehaviour
 
         return PlaceItemOnTile(item, emptyTile);
     }
+
+    /// <summary>
+    /// Get the nearest empty tile to a position
+    /// </summary>
+    public Tile GetNearestEmptyTile(Vector3 position)
+    {
+        List<Tile> emptyTiles = GetAllEmptyTiles();
+
+        if (emptyTiles.Count == 0)
+        {
+            Debug.LogWarning("No empty tiles available!");
+            return null;
+        }
+
+        Tile nearestTile = emptyTiles[0];
+        float shortestDistance = Vector3.Distance(position, nearestTile.transform.position);
+
+        foreach (Tile tile in emptyTiles)
+        {
+            float distance = Vector3.Distance(position, tile.transform.position);
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                nearestTile = tile;
+            }
+        }
+
+        return nearestTile;
+    }
 }

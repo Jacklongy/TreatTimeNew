@@ -96,6 +96,7 @@ public class DogFeeder : MonoBehaviour
     bool AddXP = true;
     public bool countDownSound;
     bool ding1, ding2, ding3;
+    bool hungerDepleted = false; // Prevent hunger end trigger from firing multiple times
 
     [Header("Ads")]
     public bool ad;
@@ -132,7 +133,11 @@ public class DogFeeder : MonoBehaviour
     private void OnDisable()
     {
         SaveData();
-        overseer.CloudDataBackUp();
+        
+        if (overseer != null)
+        {
+            overseer.CloudDataBackUp();
+        }
     }
 
     /// <summary>
@@ -151,7 +156,11 @@ public class DogFeeder : MonoBehaviour
     private void OnApplicationQuit()
     {
         SaveData();
-        overseer.CloudDataBackUp();
+        
+        if (overseer != null)
+        {
+            overseer.CloudDataBackUp();
+        }
     }
 
   
@@ -260,6 +269,7 @@ public class DogFeeder : MonoBehaviour
         ding1 = false;
         ding2 = false;
         ding3 = false;
+        hungerDepleted = false; // Reset hunger depletion flag
 
         // If the player has played dont show the tutorial. 
         if (hasPlayed == 0)
@@ -383,9 +393,10 @@ public class DogFeeder : MonoBehaviour
         // Calculates the XP for the end of the game. 
         XPthisGame = mealCount * coinCount / 2;
 
-        // Trigger the add if hunger reaches 0.
-        if (hungerLevel <= 0)
+        // Trigger the end when hunger reaches 0 (ONLY ONCE)
+        if (hungerLevel <= 0 && !hungerDepleted)
         {
+            hungerDepleted = true; // Prevent this from running multiple times
             grab.NoPickUp = true;
 
             // Depending on what the player chooses. 

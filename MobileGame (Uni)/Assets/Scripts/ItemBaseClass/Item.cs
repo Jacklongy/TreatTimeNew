@@ -124,7 +124,8 @@ public abstract class Item : MonoBehaviour
         {
             //Debug.Log("Merged from inv");
 
-            ItemSpawner.slotEmpty -= 1;
+            // DEPRECATED: slotEmpty no longer used - unified grid system in place
+            //ItemSpawner.slotEmpty -= 1;
         }
     }
     #endregion

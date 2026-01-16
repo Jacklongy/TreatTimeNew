@@ -4,53 +4,38 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Attached to each item spawn button in the hotbar.
-/// When clicked, spawns that item on a random empty grid tile.
+/// Attached to spawn buttons.
+/// When clicked (via OnClick event), spawns a random item from the array onto the grid.
 /// </summary>
 public class ItemButton : MonoBehaviour
 {
     [Header("Item Setup")]
-    public GameObject itemPrefab; // The item to spawn when button is clicked
-    public Image buttonImage; // Visual representation of the item
-    public Button button; // The button component
-
+    public GameObject[] itemPrefabs; // Array of items to randomly spawn
+    
     [Header("References")]
-    private ItemSpawner itemSpawner;
     private GridManager gridManager;
+    private SoundManagerScript soundManager;
 
     private void Start()
     {
-        itemSpawner = FindObjectOfType<ItemSpawner>();
         gridManager = FindObjectOfType<GridManager>();
+        soundManager = FindObjectOfType<SoundManagerScript>();
 
-        if (button == null)
-            button = GetComponent<Button>();
-
-        // Add button click listener
-        button.onClick.AddListener(OnButtonClicked);
-
-        // Set button image if not assigned
-        if (buttonImage == null && itemPrefab != null)
+        if (itemPrefabs == null || itemPrefabs.Length == 0)
         {
-            // Try to get the sprite from the item prefab
-            SpriteRenderer spriteRenderer = itemPrefab.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null && buttonImage != null)
-            {
-                buttonImage.sprite = spriteRenderer.sprite;
-            }
+            Debug.LogWarning($"ItemButton on {gameObject.name} has no item prefabs assigned!");
         }
-
-        Debug.Log($"ItemButton initialized for: {itemPrefab.name}");
     }
 
     /// <summary>
-    /// Called when the button is clicked
+    /// Called by Button OnClick event
+    /// Spawns random item from array onto grid
     /// </summary>
-    public void OnButtonClicked()
+    public void SpawnRandomItem()
     {
-        if (itemPrefab == null)
+        if (itemPrefabs == null || itemPrefabs.Length == 0)
         {
-            Debug.LogError("Item prefab not assigned to button!");
+            Debug.LogError("No item prefabs assigned!");
             return;
         }
 
@@ -60,7 +45,7 @@ public class ItemButton : MonoBehaviour
             return;
         }
 
-        // Get a random empty tile
+        // Get random empty tile
         Tile emptyTile = gridManager.GetRandomEmptyTile();
 
         if (emptyTile == null)
@@ -69,43 +54,38 @@ public class ItemButton : MonoBehaviour
             return;
         }
 
-        // Spawn the item
-        SpawnItemOnTile(emptyTile);
+        // Pick random item from array
+        GameObject randomItemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
 
-        // Play sound effect
-        SoundManagerScript soundManager = FindObjectOfType<SoundManagerScript>();
+        // Spawn the item
+        SpawnItemOnTile(randomItemPrefab, emptyTile);
+
+        // Play sound
         if (soundManager != null)
         {
-            soundManager.Play("ItemSpawn"); // Change to whatever your spawn sound is
+            soundManager.Play("ItemSpawn");
         }
 
-        Debug.Log($"Spawned {itemPrefab.name} on grid");
+        Debug.Log($"Spawned {randomItemPrefab.name} on grid");
     }
 
     /// <summary>
-    /// Spawn the item on a specific tile
+    /// Spawn item on specific tile
     /// </summary>
-    private void SpawnItemOnTile(Tile tile)
+    private void SpawnItemOnTile(GameObject itemPrefab, Tile tile)
     {
-        // Instantiate the item
+        // Instantiate item at tile position
         GameObject spawnedItem = Instantiate(itemPrefab, tile.transform.position, Quaternion.identity);
 
-        // Place it on the tile
+        // Place on tile
         tile.TakeObject(spawnedItem);
 
-        // Reset the item's animation state
+        // Reset animation
         Item itemComponent = spawnedItem.GetComponent<Item>();
         if (itemComponent != null)
         {
             itemComponent.ResetAnim();
         }
     }
-
-    private void OnDestroy()
-    {
-        if (button != null)
-        {
-            button.onClick.RemoveListener(OnButtonClicked);
-        }
-    }
 }
+

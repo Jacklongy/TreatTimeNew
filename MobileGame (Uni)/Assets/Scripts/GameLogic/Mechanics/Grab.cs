@@ -201,9 +201,6 @@ public class Grab : MonoBehaviour
 
                 // close eyes here aswell or something
             }
-            
-          
-            Vector3 offset = new Vector3(0f, 1f, 0f);
 
             Item item = currentlyDragging.GetComponent<Item>();
 
@@ -236,8 +233,8 @@ public class Grab : MonoBehaviour
             }
             else
             {
-                // we basically set the objects position to where our finger is. with a little offset for faster placing
-                currentlyDragging.transform.position = new Vector3(worldPos.x, worldPos.y, worldPos.z) + offset;
+                // All items are on grid now - no offset needed
+                currentlyDragging.transform.position = new Vector3(worldPos.x, worldPos.y, worldPos.z);
             }
         }
         #endregion
@@ -300,11 +297,12 @@ public class Grab : MonoBehaviour
                 {
                     SnapBackToTile();
                 }
-                // else if the item was taken from the inventory. snap back to the slot. 
+                // else if the item was taken from the grid. snap back to the tile. 
                 else if (hitMerge.collider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null &&
                     currentlyDragging.GetComponent<Bowl>().ItemInBowl == null && currentlyDragging.GetComponent<Item>().GridCheck() == false)
                 {
-                    SnapBackToSlot();
+                    // All items on grid now - snap back to tile
+                    SnapBackToTile();
                 }
 
 
@@ -386,7 +384,8 @@ public class Grab : MonoBehaviour
                 }
                 else
                 {
-                    SnapBackToSlot();
+                    // All items are on grid now - snap back to last tile
+                    SnapBackToTile();
                 }
 
             }
@@ -399,7 +398,8 @@ public class Grab : MonoBehaviour
 
             else
             {
-                SnapBackToSlot();
+                // All items are on grid - snap back to tile
+                SnapBackToTile();
             }
 
            
@@ -447,18 +447,41 @@ public class Grab : MonoBehaviour
     }
 
     /// <summary>
-    /// Snap back to tile logic. 
+    /// Snap to nearest empty tile logic. 
     /// </summary>
     public void SnapBackToTile()
     {
-        // snap back to last grid spot instead. 
-        LastTileHit.GetComponent<Tile>().TakeObject(currentlyDragging);
+        GridManager gridManager = FindObjectOfType<GridManager>();
 
-        currentlyDragging.layer = 7;
+        if (gridManager == null)
+        {
+            Debug.LogError("GridManager not found!");
+            Clear();
+            return;
+        }
+
+        // Get the nearest empty tile to current drop position
+        Tile nearestTile = gridManager.GetNearestEmptyTile(currentlyDragging.transform.position);
+
+        if (nearestTile != null)
+        {
+            // Place on nearest tile
+            nearestTile.TakeObject(currentlyDragging);
+            currentlyDragging.layer = 7;
+            FindObjectOfType<SoundManagerScript>().Play("CantPlace");
+        }
+        else
+        {
+            // No empty tiles - snap back to original tile
+            if (LastTileHit != null)
+            {
+                LastTileHit.GetComponent<Tile>().TakeObject(currentlyDragging);
+                currentlyDragging.layer = 7;
+                Debug.LogWarning("No empty tiles available, snapped back to original tile");
+            }
+        }
 
         Clear();
-
-        FindObjectOfType<SoundManagerScript>().Play("CantPlace");
     }
 
     /// <summary>

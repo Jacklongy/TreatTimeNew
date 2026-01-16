@@ -1,3 +1,9 @@
+// DEPRECATED: ItemSlot is no longer used.
+// The new unified grid system uses Tiles and GridManager for all item placement.
+// Items are spawned directly onto grid tiles via ItemButton clicks.
+// Keeping this file for reference only.
+
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -96,3 +102,4 @@ public class ItemSlot : MonoBehaviour, IItemSlot
         }
     }
 }
+*/
