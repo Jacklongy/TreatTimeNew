@@ -22,6 +22,9 @@ public class Grab : MonoBehaviour
     [Header("Dog Animation")]
     public Animator dog;
 
+    [Header("Merge Detection")]
+    public float mergeDetectionRadius = 0.5f; // Radius for detecting nearby items to merge
+
     // The Position where we tap!
     Vector3 worldPos;
 
@@ -277,14 +280,27 @@ public class Grab : MonoBehaviour
 
 
             // We send a new ray cast when we let go of the object to see if we are above something we can merge with...
-            RaycastHit2D hitMerge = Physics2D.Raycast(currentlyDragging.transform.position, Vector3.forward);
+            // Use OverlapCircle to detect nearby items within merge radius
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(currentlyDragging.transform.position, mergeDetectionRadius);
+
+            Collider2D hitCollider = null;
+            
+            // Find the first valid collider to interact with (not the item itself)
+            foreach (Collider2D col in hitColliders)
+            {
+                if (col.gameObject != currentlyDragging)
+                {
+                    hitCollider = col;
+                    break;
+                }
+            }
 
     
             // so if we hit something underneath our currently dragging object...
-            if (hitMerge.collider != null)
+            if (hitCollider != null)
             {
                 // reference to that hit object.  this isnt nessasary but streamlines code a little better.
-                HitObject = hitMerge.collider.gameObject;
+                HitObject = hitCollider.gameObject;
 
                 // so here what do we want to do.. we want to check what we have hit. (Talking to self via code comments im going mad lol)
 
@@ -292,13 +308,13 @@ public class Grab : MonoBehaviour
                 // do this for last min clean ups. For now focusing on main features. 
 
                 // If we hit the dog when we drop, and the item is not a bowl with food. then snap back to a tile if it was already on the grid. 
-                if(hitMerge.collider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null && 
+                if(hitCollider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null && 
                     currentlyDragging.GetComponent<Bowl>().ItemInBowl == null && currentlyDragging.GetComponent<Item>().GridCheck())
                 {
                     SnapBackToTile();
                 }
                 // else if the item was taken from the grid. snap back to the tile. 
-                else if (hitMerge.collider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null &&
+                else if (hitCollider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null &&
                     currentlyDragging.GetComponent<Bowl>().ItemInBowl == null && currentlyDragging.GetComponent<Item>().GridCheck() == false)
                 {
                     // All items on grid now - snap back to tile
@@ -308,10 +324,10 @@ public class Grab : MonoBehaviour
 
                 #region Bowl Checks and Feeding dog
                 // If the item we are dragging can be put in a bowl, and we hit a bowl, add that item to the bowl
-                else if (hitMerge.collider != null && currentlyDragging.GetComponent<IBowlable>() != null && hitMerge.collider.gameObject.GetComponent<IBowl>() != null &&
-                    hitMerge.collider.gameObject.GetComponent<IBowl>().CheckFull() != true)
+                else if (hitCollider != null && currentlyDragging.GetComponent<IBowlable>() != null && hitCollider.gameObject.GetComponent<IBowl>() != null &&
+                    hitCollider.gameObject.GetComponent<IBowl>().CheckFull() != true)
                 {
-                    IBowl bowl = hitMerge.collider.gameObject.GetComponent<IBowl>();
+                    IBowl bowl = hitCollider.gameObject.GetComponent<IBowl>();
 
                     bowl.TakeItem(currentlyDragging);
 
@@ -320,7 +336,7 @@ public class Grab : MonoBehaviour
                
               
                 // If the Item we are currently dragging can feed the dog, and we hit the dog feed the dog. 
-                else if (currentlyDragging.GetComponent<IFeedDog>() != null && hitMerge.collider.gameObject.GetComponent<DogFeeder>() != null)
+                else if (currentlyDragging.GetComponent<IFeedDog>() != null && hitCollider.gameObject.GetComponent<DogFeeder>() != null)
                 {
                     IFeedDog bowl = currentlyDragging.GetComponent<IFeedDog>();
 
@@ -331,7 +347,7 @@ public class Grab : MonoBehaviour
                     return;
                 }
 
-                else if(hitMerge.collider.gameObject.GetComponent<IBowl>() != null && HitObject.GetComponent<Bowl>().ItemInBowl != null)
+                else if(hitCollider.gameObject.GetComponent<IBowl>() != null && HitObject.GetComponent<Bowl>().ItemInBowl != null)
                 {
                     // snap back to last grid spot instead.
                     SnapBackToTile();
@@ -343,7 +359,7 @@ public class Grab : MonoBehaviour
 
                 #region Merging
                 // if it has the same tag as the item we are currently holding then merge. 
-                else if (HitObject.CompareTag(currentlyDragging.tag) && HitObject.layer == 7)
+                else if (HitObject.CompareTag(currentlyDragging.tag) && HitObject.GetComponent<Item>() != null && currentlyDragging != HitObject)
                 {
                     Item item = currentlyDragging.GetComponent<Item>();
 
