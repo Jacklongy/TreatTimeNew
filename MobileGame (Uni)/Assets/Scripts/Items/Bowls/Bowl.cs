@@ -18,17 +18,8 @@ public class Bowl : Item , IBowl, IFeedDog
    
     void Start()
     {
-        if (CompareTag("Blue"))
-        {
-            gameObject.layer = 3;
-
-        }
-        else
-        {
-            OnGrid = true;
-            gameObject.layer = 7;
-        }
-
+        OnGrid = true;
+        gameObject.layer = 7;
     }
 
     public override string GridTag()

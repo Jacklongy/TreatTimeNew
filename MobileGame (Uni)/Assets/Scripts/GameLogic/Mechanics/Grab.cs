@@ -167,23 +167,15 @@ public class Grab : MonoBehaviour
             // if we are currently dragging an object...
             if (currentlyDragging != null)
             {
-                // Send another ray cast after pickup to remove the item from that current grid tile.
-                RaycastHit2D GridCheck = Physics2D.Raycast(currentlyDragging.transform.position, Vector3.forward);
-
-                // If the grid slot has been colided with
-                if (GridCheck.collider != null)
+                // Find the tile this item is sitting on via GridManager (reliable)
+                GridManager gm = GridManager.instance != null ? GridManager.instance : FindObjectOfType<GridManager>();
+                if (gm != null)
                 {
-                    // we get the reference to the tile script on the tile.
-                    TileHit = GridCheck.collider.gameObject;
-
-                    if (TileHit.GetComponent<Tile>())
+                    Tile sourceTile = gm.GetTileForItem(currentlyDragging);
+                    if (sourceTile != null)
                     {
-                        // and we remove the object from the tile. 
-                        TileHit.GetComponent<Tile>().RemoveObject();
-
-                        LastTileHit = TileHit;
-
-                        TileHit = null;
+                        sourceTile.RemoveObject();
+                        LastTileHit = sourceTile.gameObject;
                     }
                 }
             }
@@ -209,24 +201,24 @@ public class Grab : MonoBehaviour
 
             SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
 
-            spriteRenderer.sortingLayerName = "Dragging";
+            if (spriteRenderer != null)
+                spriteRenderer.sortingLayerName = "Dragging";
 
             foreach (Transform child in currentlyDragging.transform)
             {
                 SpriteRenderer spriteRendererChild = child.GetComponent<SpriteRenderer>();
-
-                     spriteRendererChild.sortingLayerName = "Dragging";
+                if (spriteRendererChild != null)
+                    spriteRendererChild.sortingLayerName = "Dragging";
 
                 if (child.childCount > 0)
                 {
                     foreach (Transform childChild in child.transform)
                     {
                         SpriteRenderer spriteRendererChildChild = childChild.GetComponent<SpriteRenderer>();
-
-                        spriteRendererChildChild.sortingLayerName = "Dragging";
+                        if (spriteRendererChildChild != null)
+                            spriteRendererChildChild.sortingLayerName = "Dragging";
                     }
                 }
-
             }
 
             if (item.OnGrid == true)
@@ -255,176 +247,149 @@ public class Grab : MonoBehaviour
             // Change Sorting Layer Back just to foreground and not dragging.
             SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
 
-            spriteRenderer.sortingLayerName = "foreGround";
-
+            if (spriteRenderer != null)
+                spriteRenderer.sortingLayerName = "foreGround";
 
             foreach (Transform child in currentlyDragging.transform)
             {
-               
                 SpriteRenderer spriteRendererChild = child.GetComponent<SpriteRenderer>();
-
-                spriteRendererChild.sortingLayerName = "foreGround";
+                if (spriteRendererChild != null)
+                    spriteRendererChild.sortingLayerName = "foreGround";
 
                 if(child.childCount > 0)
                 {
                     foreach (Transform childChild in child.transform)
                     {
                         SpriteRenderer spriteRendererChildChild = childChild.GetComponent<SpriteRenderer>();
-
-                        spriteRendererChildChild.sortingLayerName = "foreGround";
+                        if (spriteRendererChildChild != null)
+                            spriteRendererChildChild.sortingLayerName = "foreGround";
                     }
                 }
-
             }
 
 
 
-            // We send a new ray cast when we let go of the object to see if we are above something we can merge with...
-            // Use OverlapCircle to detect nearby items within merge radius
-            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(currentlyDragging.transform.position, mergeDetectionRadius);
+            // --- Detection: find what we dropped on ---
+            GridManager gm = GridManager.instance != null ? GridManager.instance : FindObjectOfType<GridManager>();
 
-            Collider2D hitCollider = null;
-            
-            // Find the first valid collider to interact with (not the item itself)
+            // Check for dog via overlap (dog isn't on a tile)
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(currentlyDragging.transform.position, mergeDetectionRadius);
+            GameObject dogHit = null;
             foreach (Collider2D col in hitColliders)
             {
-                if (col.gameObject != currentlyDragging)
+                if (col.gameObject == currentlyDragging) continue;
+                if (col.gameObject.GetComponent<DogFeeder>() != null || col.gameObject.CompareTag("Dog"))
                 {
-                    hitCollider = col;
+                    dogHit = col.gameObject;
                     break;
                 }
             }
 
-    
-            // so if we hit something underneath our currently dragging object...
-            if (hitCollider != null)
+            // Find the nearest tile to where we dropped
+            Tile dropTile = gm != null ? gm.GetNearestTile(currentlyDragging.transform.position) : null;
+            GameObject itemOnTile = (dropTile != null && dropTile.IsFull) ? dropTile.ObjectContainer : null;
+
+            bool handled = false;
+
+            #region Feed Dog
+            // Bowl with food + Dog = feed
+            if (!handled && dogHit != null && currentlyDragging.GetComponent<IFeedDog>() != null && dogHit.GetComponent<DogFeeder>() != null)
             {
-                // reference to that hit object.  this isnt nessasary but streamlines code a little better.
-                HitObject = hitCollider.gameObject;
+                IFeedDog feedBowl = currentlyDragging.GetComponent<IFeedDog>();
+                Clear();
+                feedBowl.WhatsInBowl();
+                handled = true;
+            }
+            // Non-feedable on dog = snap back
+            if (!handled && dogHit != null)
+            {
+                SnapBackToTile();
+                handled = true;
+            }
+            #endregion
 
-                // so here what do we want to do.. we want to check what we have hit. (Talking to self via code comments im going mad lol)
+            #region Bowl Checks
+            // IBowlable item + empty bowl on tile = put item in bowl
+            if (!handled && itemOnTile != null && currentlyDragging.GetComponent<IBowlable>() != null
+                && itemOnTile.GetComponent<IBowl>() != null && !itemOnTile.GetComponent<IBowl>().CheckFull())
+            {
+                itemOnTile.GetComponent<IBowl>().TakeItem(currentlyDragging);
+                Clear();
+                handled = true;
+            }
+            // Trying to drop on a full bowl = snap back
+            if (!handled && itemOnTile != null && itemOnTile.GetComponent<Bowl>() != null
+                && itemOnTile.GetComponent<Bowl>().ItemInBowl != null
+                && currentlyDragging.GetComponent<IBowlable>() == null)
+            {
+                SnapBackToTile();
+                handled = true;
+            }
+            #endregion
 
-                // We can seperate the logic for the bowls and The food for more read ability. 
-                // do this for last min clean ups. For now focusing on main features. 
+            #region Merging
+            // Same tag on tile = merge
+            if (!handled && itemOnTile != null && itemOnTile.GetComponent<Item>() != null
+                && itemOnTile.CompareTag(currentlyDragging.tag) && itemOnTile != currentlyDragging)
+            {
+                Merge(itemOnTile);
+                Clear();
+                handled = true;
+            }
+            #endregion
 
-                // If we hit the dog when we drop, and the item is not a bowl with food. then snap back to a tile if it was already on the grid. 
-                if(hitCollider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null && 
-                    currentlyDragging.GetComponent<Bowl>().ItemInBowl == null && currentlyDragging.GetComponent<Item>().GridCheck())
+            #region Tile Placement
+            // Empty tile = place there
+            if (!handled && dropTile != null && !dropTile.IsFull)
+            {
+                dropTile.TakeObject(currentlyDragging);
+                currentlyDragging.layer = 7;
+                currentlyDragging.GetComponent<Item>().Dropped();
+                Clear();
+                handled = true;
+            }
+
+            // Occupied tile with non-mergeable item = swap
+            if (!handled && dropTile != null && dropTile.IsFull && itemOnTile != null)
+            {
+                // Remove other item from target tile
+                dropTile.RemoveObject();
+
+                // Place our item on target tile
+                dropTile.TakeObject(currentlyDragging);
+                currentlyDragging.layer = 7;
+                currentlyDragging.GetComponent<Item>().Dropped();
+
+                // Put displaced item on our original tile
+                if (LastTileHit != null)
                 {
-                    SnapBackToTile();
-                }
-                // else if the item was taken from the grid. snap back to the tile. 
-                else if (hitCollider.gameObject.CompareTag("Dog") && currentlyDragging.GetComponent<Bowl>() != null &&
-                    currentlyDragging.GetComponent<Bowl>().ItemInBowl == null && currentlyDragging.GetComponent<Item>().GridCheck() == false)
-                {
-                    // All items on grid now - snap back to tile
-                    SnapBackToTile();
-                }
-
-
-                #region Bowl Checks and Feeding dog
-                // If the item we are dragging can be put in a bowl, and we hit a bowl, add that item to the bowl
-                else if (hitCollider != null && currentlyDragging.GetComponent<IBowlable>() != null && hitCollider.gameObject.GetComponent<IBowl>() != null &&
-                    hitCollider.gameObject.GetComponent<IBowl>().CheckFull() != true)
-                {
-                    IBowl bowl = hitCollider.gameObject.GetComponent<IBowl>();
-
-                    bowl.TakeItem(currentlyDragging);
-
-                    Clear();
-                }
-               
-              
-                // If the Item we are currently dragging can feed the dog, and we hit the dog feed the dog. 
-                else if (currentlyDragging.GetComponent<IFeedDog>() != null && hitCollider.gameObject.GetComponent<DogFeeder>() != null)
-                {
-                    IFeedDog bowl = currentlyDragging.GetComponent<IFeedDog>();
-
-                    Clear();
-
-                    bowl.WhatsInBowl();
-
-                    return;
-                }
-
-                else if(hitCollider.gameObject.GetComponent<IBowl>() != null && HitObject.GetComponent<Bowl>().ItemInBowl != null)
-                {
-                    // snap back to last grid spot instead.
-                    SnapBackToTile();
-
-                    return;
-                }
-
-                #endregion
-
-                #region Merging
-                // if it has the same tag as the item we are currently holding then merge. 
-                else if (HitObject.CompareTag(currentlyDragging.tag) && HitObject.GetComponent<Item>() != null && currentlyDragging != HitObject)
-                {
-                    Item item = currentlyDragging.GetComponent<Item>();
-
-                    item.MergeFromInvCheck();
-
-                    Merge(HitObject);
-
-                    Clear();
-                }
-
-
-                #endregion
-
-                #region Tiles and Item Slots
-
-                // if we hit a tile that isnt full. let that tile take the item. 
-                else if (HitObject.GetComponent<Tile>() != null && HitObject.GetComponent<Tile>().IsFull == false
-                    && HitObject.GetComponent<Tile>().CompareTag(currentlyDragging.GetComponent<Item>().GridTag()))
-                {
-
-                    HitObject.GetComponent<Tile>().TakeObject(currentlyDragging);
-
-                    currentlyDragging.layer = 7;
-
-                    Item item = currentlyDragging.GetComponent<Item>();
-
-                    item.Dropped();
-
-                    Clear();
-                }
-
-                
-                #region snapping back
-                else if (currentlyDragging.GetComponent<Item>().GridCheck())
-                {
-                    // snap back to last grid spot instead. 
-                    SnapBackToTile();
+                    LastTileHit.GetComponent<Tile>().TakeObject(itemOnTile);
+                    itemOnTile.layer = 7;
                 }
                 else
                 {
-                    // All items are on grid now - snap back to last tile
-                    SnapBackToTile();
+                    // No original tile recorded, find nearest empty
+                    if (gm != null)
+                    {
+                        Tile fallback = gm.GetNearestEmptyTile(itemOnTile.transform.position);
+                        if (fallback != null)
+                        {
+                            fallback.TakeObject(itemOnTile);
+                            itemOnTile.layer = 7;
+                        }
+                    }
                 }
 
+                Clear();
+                handled = true;
             }
-
-            else if (currentlyDragging.GetComponent<Item>().GridCheck())
-            {
-                // snap back to last grid spot instead. 
-                SnapBackToTile();
-            }
-
-            else
-            {
-                // All items are on grid - snap back to tile
-                SnapBackToTile();
-            }
-
-           
-
-
             #endregion
 
-
-
+            #region Fallback
+            if (!handled)
+            {
+                SnapBackToTile();
+            }
             #endregion
         }
         else
@@ -451,15 +416,8 @@ public class Grab : MonoBehaviour
     /// </summary>
     public void SnapBackToSlot()
     {
-        FindObjectOfType<SoundManagerScript>().Play("CantPlace");
-
-        Item Return = currentlyDragging.GetComponent<Item>();
-
-        Return.ReturnToMySlot();
-
-        currentlyDragging.layer = 3;
-
-        Clear();
+        // DEPRECATED: Redirects to tile-based snap back (old slot system removed)
+        SnapBackToTile();
     }
 
     /// <summary>
@@ -508,16 +466,11 @@ public class Grab : MonoBehaviour
         if (currentlyDragging != null)
         {
             SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+                spriteRenderer.sortingLayerName = "foreGround";
 
-            spriteRenderer.sortingLayerName = "foreGround";
-
-            Item Return = currentlyDragging.GetComponent<Item>();
-
-            Return.ReturnToMySlot();
-
-            currentlyDragging.layer = 7;
-
-            Clear();
+            // Snap back to nearest empty tile (old slot system removed)
+            SnapBackToTile();
         }
     }
 
@@ -527,11 +480,65 @@ public class Grab : MonoBehaviour
     /// <param name="New"> The item to merge </param>
     public void Merge(GameObject New)
     {
+        // Find and clear the tile that the target item is sitting on
+        GridManager gridManager = GridManager.instance != null ? GridManager.instance : FindObjectOfType<GridManager>();
+        Tile targetTile = null;
+        Vector3 mergePos = New.transform.position;
+
+        if (gridManager != null)
+        {
+            foreach (Tile tile in gridManager.allTiles)
+            {
+                if (tile.ObjectContainer == New)
+                {
+                    targetTile = tile;
+                    tile.RemoveObject();
+                    break;
+                }
+            }
+        }
+
+        // Perform the merge (this Instantiates the next item and Destroys the target)
         Item merge = New.GetComponent<Item>();
-
         merge.Merge(New);
-
         Destroy(currentlyDragging);
+
+        // Wait a frame for physics to register the new item, then place it on the tile
+        if (targetTile != null)
+        {
+            StartCoroutine(PlaceMergedItemNextFrame(targetTile, mergePos));
+        }
+    }
+
+    private IEnumerator PlaceMergedItemNextFrame(Tile targetTile, Vector3 mergePos)
+    {
+        yield return null; // Wait one frame for Instantiate to fully register
+
+        // Skip if something already filled this tile
+        if (targetTile.IsFull) yield break;
+
+        Collider2D[] nearby = Physics2D.OverlapCircleAll(mergePos, 0.5f);
+        foreach (Collider2D col in nearby)
+        {
+            if (col != null && col.GetComponent<Item>() != null && !IsItemOnAnyTile(col.gameObject))
+            {
+                targetTile.TakeObject(col.gameObject);
+                col.gameObject.layer = 7;
+                yield break;
+            }
+        }
+    }
+
+    private bool IsItemOnAnyTile(GameObject item)
+    {
+        GridManager gridManager = GridManager.instance != null ? GridManager.instance : FindObjectOfType<GridManager>();
+        if (gridManager == null) return false;
+
+        foreach (Tile tile in gridManager.allTiles)
+        {
+            if (tile.ObjectContainer == item) return true;
+        }
+        return false;
     }
 
 

@@ -176,4 +176,43 @@ public class GridManager : MonoBehaviour
 
         return nearestTile;
     }
+
+    /// <summary>
+    /// Get the nearest tile (empty or occupied) to a position
+    /// </summary>
+    public Tile GetNearestTile(Vector3 position)
+    {
+        if (allTiles == null || allTiles.Length == 0) return null;
+
+        Tile nearestTile = null;
+        float shortestDistance = float.MaxValue;
+
+        foreach (Tile tile in allTiles)
+        {
+            float distance = Vector3.Distance(position, tile.transform.position);
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                nearestTile = tile;
+            }
+        }
+
+        return nearestTile;
+    }
+
+    /// <summary>
+    /// Find which tile an item is sitting on (by ObjectContainer reference)
+    /// </summary>
+    public Tile GetTileForItem(GameObject item)
+    {
+        if (item == null) return null;
+
+        foreach (Tile tile in allTiles)
+        {
+            if (tile.ObjectContainer == item)
+                return tile;
+        }
+
+        return null;
+    }
 }

@@ -19,8 +19,8 @@ public class BabyCow : Item
 
     private void Start()
     {
-        // Set layer to inv so we can merge within the inventory.
-        gameObject.layer = 3;
+        OnGrid = true;
+        gameObject.layer = 7;
     }
     #endregion
 

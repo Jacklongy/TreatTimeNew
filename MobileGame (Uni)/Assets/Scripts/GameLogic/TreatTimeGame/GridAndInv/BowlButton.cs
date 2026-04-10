@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Attached to spawn buttons.
-/// When clicked (via OnClick event), spawns a random item from the array onto the grid.
+/// When clicked (via OnClick event), spawns a random bowl from the array onto the grid.
 /// </summary>
-public class ItemButton : MonoBehaviour
+public class BowlButton : MonoBehaviour
 {
-    [Header("Item Setup")]
-    public GameObject[] itemPrefabs; // Array of items to randomly spawn
+    [Header("Bowl Setup")]
+    public GameObject[] bowlPrefabs; // Array of bowls to randomly spawn
     
     [Header("References")]
     private GridManager gridManager;
@@ -39,23 +39,23 @@ public class ItemButton : MonoBehaviour
             ProgressRing.fillAmount = 1f;
         }
 
-        if (itemPrefabs == null || itemPrefabs.Length == 0)
+        if (bowlPrefabs == null || bowlPrefabs.Length == 0)
         {
-            Debug.LogWarning($"ItemButton on {gameObject.name} has no item prefabs assigned!");
+            Debug.LogWarning($"BowlButton on {gameObject.name} has no bowl prefabs assigned!");
         }
     }
 
     /// <summary>
     /// Called by Button OnClick event
-    /// Spawns random item from array onto grid
+    /// Spawns random bowl from array onto grid
     /// </summary>
-    public void SpawnRandomItem()
+    public void SpawnRandomBowl()
     {
         if (!canSpawn) return;
 
-        if (itemPrefabs == null || itemPrefabs.Length == 0)
+        if (bowlPrefabs == null || bowlPrefabs.Length == 0)
         {
-            Debug.LogError("No item prefabs assigned!");
+            Debug.LogError("No bowl prefabs assigned!");
             return;
         }
 
@@ -74,19 +74,19 @@ public class ItemButton : MonoBehaviour
             return;
         }
 
-        // Pick random item from array
-        GameObject randomItemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
+        // Pick random bowl from array
+        GameObject randomBowlPrefab = bowlPrefabs[Random.Range(0, bowlPrefabs.Length)];
 
-        // Spawn the item
-        SpawnItemOnTile(randomItemPrefab, emptyTile);
+        // Spawn the bowl
+        SpawnBowlOnTile(randomBowlPrefab, emptyTile);
 
         // Play sound
         if (soundManager != null)
         {
-            soundManager.Play("ItemSpawn");
+            soundManager.Play("BowlSpawn");
         }
 
-        Debug.Log($"Spawned {randomItemPrefab.name} on grid");
+        Debug.Log($"Spawned {randomBowlPrefab.name} on grid");
 
         // Track presses and start cooldown when used up
         pressesRemaining--;
@@ -128,22 +128,21 @@ public class ItemButton : MonoBehaviour
     }
 
     /// <summary>
-    /// Spawn item on specific tile
+    /// Spawn bowl on specific tile
     /// </summary>
-    private void SpawnItemOnTile(GameObject itemPrefab, Tile tile)
+    private void SpawnBowlOnTile(GameObject bowlPrefab, Tile tile)
     {
-        // Instantiate item at tile position
-        GameObject spawnedItem = Instantiate(itemPrefab, tile.transform.position, Quaternion.identity);
+        // Instantiate bowl at tile position
+        GameObject spawnedBowl = Instantiate(bowlPrefab, tile.transform.position, Quaternion.identity);
 
         // Place on tile
-        tile.TakeObject(spawnedItem);
+        tile.TakeObject(spawnedBowl);
 
         // Reset animation
-        Item itemComponent = spawnedItem.GetComponent<Item>();
+        Item itemComponent = spawnedBowl.GetComponent<Item>();
         if (itemComponent != null)
         {
             itemComponent.ResetAnim();
         }
     }
 }
-

@@ -28,6 +28,8 @@ public class CookedPork :Item, IBowlable
 
     public override void Merge(GameObject MergeMe)
     {
+        base.Merge(MergeMe);
+
         if (MergeMe.CompareTag(this.tag))
         {
             Debug.Log("i merged");

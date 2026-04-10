@@ -70,40 +70,21 @@ public abstract class Item : MonoBehaviour
     {
         Instantiate(particlesDrop, gameObject.transform.position, gameObject.transform.rotation);
 
-      
-        if (overseer.Vibrations == true)
+        if (overseer != null && overseer.Vibrations == true)
         {
-            //Handheld.Vibrate();
-
             Debug.Log("Vibrate");
             //HapticFeedback.MediumFeedback();
         }
-      
+
         // this makes sure we hit the item instead of the tile first
         gameObject.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 
-        if (!OnGrid && mySlot != null)
-        {
-            IItemSlot slot = mySlot.GetComponent<IItemSlot>();
-
-            slot.ReturnToSlot(false);
-
-            OnGrid = true;
-
-            gameObject.layer = 7;
-        }
-
-        // removes slot because its been put on map
-        mySlot = null;
-
-        if (OnGrid && mySlot == null)
-        {
-            Debug.Log("no slot and im on the grid");
-        }
+        OnGrid = true;
+        gameObject.layer = 7;
 
         // sounds
-        sound.Play("Place");
-
+        if (sound != null)
+            sound.Play("Place");
     }
 
     public bool GridCheck()
@@ -130,19 +111,18 @@ public abstract class Item : MonoBehaviour
     }
     #endregion
 
-    #region Item Slots
+    #region Item Slots (DEPRECATED - unified grid system)
     public void ReturnToMySlot()
     {
-        IItemSlot slot = mySlot.GetComponent<IItemSlot>();
+        // Old slot system removed - this should no longer be called
+        Debug.LogWarning("ReturnToMySlot called but slot system is deprecated");
         ResetAnim();
-        slot.ReturnToSlot(true);
     }
 
     public void MySlot(GameObject slot)
     {
-        mySlot = slot;
-
-       // Debug.Log("My Slot is " + slot.name);
+        // Old slot system removed
+        Debug.LogWarning("MySlot called but slot system is deprecated");
     }
     #endregion
 

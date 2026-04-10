@@ -21,6 +21,10 @@ public class Tile : MonoBehaviour
 
         Item Object = ObjectContainer.GetComponent<Item>();
 
+        // Ensure item is marked as on-grid with correct layer
+        Object.OnGrid = true;
+        Item.layer = 7;
+
         Object.ResetAnim();
 
        // Debug.Log("Im full with" + ObjectContainer);
