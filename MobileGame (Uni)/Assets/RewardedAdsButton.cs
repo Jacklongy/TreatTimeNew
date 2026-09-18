@@ -14,8 +14,6 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     [SerializeField] private float retryDelay = 2f;
     private int currentRetryCount = 0;
 
-    DogFeeder dog;
-
     void Awake()
     {
         // Get the Ad Unit ID for the current platform:
@@ -77,15 +75,13 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
         {
             Debug.Log("Unity Ads Rewarded Ad Completed");
 
-            dog = FindObjectOfType<DogFeeder>(); 
-
-            if (dog != null)
+            if (AdRewardManager.Instance != null)
             {
-                dog.AdReward(true);
+                AdRewardManager.Instance.GrantReward();
             }
             else
             {
-                Debug.LogWarning("DogFeeder not found in scene!");
+                Debug.LogWarning("AdRewardManager not found in scene!");
             }
 
             _showAdButton.interactable = true;

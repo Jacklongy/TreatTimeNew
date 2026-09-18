@@ -34,8 +34,6 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5404073724282198239}
-  - {fileID: 3341863158161407639}
-  - {fileID: 1853988312631289213}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3243557988358148792
@@ -159,10 +157,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba77c3aba7afe54d81f9fcdd1797b05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreLevel: 1
   OnGrid: 0
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
+  droppedSound: 
   LeftAwake: {fileID: 8251435251087106936}
   RightAwake: {fileID: 7384063919948496402}
   LeftLeg: {fileID: 7617191917827399766}
@@ -285,6 +285,8 @@ Transform:
   m_LocalScale: {x: 1.6364201, y: 1.6364201, z: 1.0227625}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 1853988312631289213}
+  - {fileID: 3341863158161407639}
   - {fileID: 9006802148617573667}
   - {fileID: 2401935715973517273}
   - {fileID: 6186320263845573447}
@@ -392,11 +394,11 @@ Transform:
   m_GameObject: {fileID: 3853647917290629393}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.299, y: -0.393, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalPosition: {x: -0.18270065, y: -0.24018039, z: 0}
+  m_LocalScale: {x: 1.22218, y: 1.22218, z: 0.97774416}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 167191830375652287}
+  m_Father: {fileID: 5404073724282198239}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8968581136863765304
 SpriteRenderer:
@@ -688,11 +690,11 @@ Transform:
   m_GameObject: {fileID: 6539439617871358124}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.18, y: -0.422, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalPosition: {x: 0.10998915, y: -0.2578973, z: 0}
+  m_LocalScale: {x: 1.22218, y: 1.22218, z: 0.97774416}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 167191830375652287}
+  m_Father: {fileID: 5404073724282198239}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8362151414259487117
 SpriteRenderer:

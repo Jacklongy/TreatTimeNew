@@ -7,6 +7,9 @@ public class CookedChicken : Item, IBowlable
     public GameObject coin;
     public string gridTag = "FoodArea";
 
+    public override int ScoreLevel => 3;
+    public override bool IsCookedFood => true;
+
     void Start()
     {
         OnGrid = true;

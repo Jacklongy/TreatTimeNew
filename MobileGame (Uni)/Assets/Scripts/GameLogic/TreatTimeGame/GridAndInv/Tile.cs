@@ -6,11 +6,19 @@ public class Tile : MonoBehaviour
 {
     public bool IsFull;
     public GameObject ObjectContainer;
+    [SerializeField] private SpaceOutline spaceOutline;
+    private bool hasWarnedMissingOutline;
+
+    private void Awake()
+    {
+        EnsureSpaceOutline();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        IsFull = false;
+        CheckIfFull();
+        HideOutline();
     }
 
     public void TakeObject(GameObject Item)
@@ -22,12 +30,18 @@ public class Tile : MonoBehaviour
         Item Object = ObjectContainer.GetComponent<Item>();
 
         // Ensure item is marked as on-grid with correct layer
-        Object.OnGrid = true;
+        if (Object != null)
+        {
+            Object.OnGrid = true;
+            Object.ResetAnim();
+        }
+
         Item.layer = 7;
 
-        Object.ResetAnim();
-
-       // Debug.Log("Im full with" + ObjectContainer);
+        GroupOutlineController controller = GroupOutlineController.Instance != null
+            ? GroupOutlineController.Instance
+            : FindObjectOfType<GroupOutlineController>();
+        controller?.RequestRefresh();
 
     }
 
@@ -35,6 +49,12 @@ public class Tile : MonoBehaviour
     {
         ObjectContainer = null;
         IsFull = false;
+
+        HideOutline();
+        GroupOutlineController controller = GroupOutlineController.Instance != null
+            ? GroupOutlineController.Instance
+            : FindObjectOfType<GroupOutlineController>();
+        controller?.RequestRefresh();
 
         Debug.Log("I Removed " + ObjectContainer);
     }
@@ -44,13 +64,53 @@ public class Tile : MonoBehaviour
         if(ObjectContainer == null)
         {
             IsFull = false;
+            return;
         }
-        else
-        {
 
-            IsFull = true;
-            Debug.Log("I contain " + ObjectContainer);
+        IsFull = true;
+    }
+
+    public void ApplyOutline(bool top, bool bottom, bool left, bool right, Color color, int sortingOrder)
+    {
+        if (!EnsureSpaceOutline())
+        {
+            return;
         }
+
+        spaceOutline.ApplyColor(color);
+        spaceOutline.ApplySortingOrder(sortingOrder);
+        spaceOutline.UpdateBorders(top, bottom, left, right);
+    }
+
+    public void HideOutline()
+    {
+        if (!EnsureSpaceOutline())
+        {
+            return;
+        }
+
+        spaceOutline.HideAll();
+    }
+
+    private bool EnsureSpaceOutline()
+    {
+        if (spaceOutline == null)
+        {
+            spaceOutline = GetComponentInChildren<SpaceOutline>(true);
+        }
+
+        if (spaceOutline == null)
+        {
+            if (!hasWarnedMissingOutline)
+            {
+                Debug.LogWarning($"Tile '{name}' has no SpaceOutline component in children.");
+                hasWarnedMissingOutline = true;
+            }
+
+            return false;
+        }
+
+        return true;
     }
     
 }

@@ -6,9 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/SplashScreen.unity
+    guid: c69465cc8285e664c99121e4b1ed41e8
+  - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: e78a2a8594d4a2a45aa2ce35bcee9f96
   - enabled: 1
-    path: Assets/Scenes/TreatTime.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
-  m_configObjects: {}
+    path: Assets/Scenes/TreatTimeNew.unity
+    guid: 27fda35929424d8459b01748a4051e30
+  m_configObjects:
+    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: a5b3c70072c6c554483cfdd082fde528, type: 2}
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 4f80e355779fa69479a5d5f8f3bb2383, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 61a323178b240944f863a527340cba58, type: 2}
+    com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: dc576ba53e30b3b4cae1501937b1a671, type: 2}

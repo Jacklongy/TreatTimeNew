@@ -7,8 +7,9 @@ public class Egg : Item
     #region Variables and Start Method
     // Merging
     public GameObject nextObject;
+
     public string gridTag = "FoodArea";
-  
+    
     private void Start()
     {
         OnGrid = true;

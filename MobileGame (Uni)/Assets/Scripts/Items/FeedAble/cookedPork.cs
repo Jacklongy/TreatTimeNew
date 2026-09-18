@@ -8,6 +8,9 @@ public class CookedPork :Item, IBowlable
 
     public string gridTag = "FoodArea";
 
+    public override int ScoreLevel => 3;
+    public override bool IsCookedFood => true;
+
     void Start()
     {
         OnGrid = true;

@@ -6,36 +6,35 @@ using UnityEngine.UI;
 
 public class settingManager : MonoBehaviour
 {
-    GameOverseer overseer;
     public TextMeshProUGUI VibOnOrOff;
 
-    private void Start()
-    {
-        overseer = FindAnyObjectByType<GameOverseer>();
-        VibOnOrOff.text = "Vibrations Off";
-    }
+    // private void Start()
+    // {
+    //     overseer = FindAnyObjectByType<GameOverseer>();
+    //     VibOnOrOff.text = "Vibrations Off";
+    // }
 
-    public void VibrationToggle()
-    {
-        overseer.VibrationsToggle();
+    // public void VibrationToggle()
+    // {
+    //     overseer.VibrationsToggle();
 
-        // text here 
-        if (overseer.Vibrations != true)
-        {
-            VibOnOrOff.text = "Vibrations Off";
-        }
-        else
-        {
+    //     // text here 
+    //     if (overseer.Vibrations != true)
+    //     {
+    //         VibOnOrOff.text = "Vibrations Off";
+    //     }
+    //     else
+    //     {
             
-            VibOnOrOff.text = "Vibrations On";
-        }
+    //         VibOnOrOff.text = "Vibrations On";
+    //     }
 
        
 
-    }
+    // }
 
-    public void CloudDataLoad()
-    {
-        overseer.UseCloud();
-    }
+    // public void CloudDataLoad()
+    // {
+    //     overseer.UseCloud();
+    // }
 }

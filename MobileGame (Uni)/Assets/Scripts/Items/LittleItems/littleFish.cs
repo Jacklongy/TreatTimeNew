@@ -7,6 +7,8 @@ public class littleFish : Item
 
     #region Animations
     public Animator Panic;
+
+    public ParticleSystem Splash;
     #endregion
 
 
@@ -45,6 +47,13 @@ public class littleFish : Item
 
             Destroy(gameObject);
         }
+    }
+
+    public override void Dropped()
+    {
+        base.Dropped();
+
+        // Custom Drop Sound
     }
 
     public override void ResetAnim()

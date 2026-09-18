@@ -648,10 +648,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a4376c2c5cb9c4a873636a09f5ca8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
+  Placed: {fileID: 0}
   LeftAwake: {fileID: 9185778744410155811}
   RightAwake: {fileID: 1583151667172277665}
   Feet: {fileID: 698646086371008091}

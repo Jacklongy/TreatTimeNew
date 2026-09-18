@@ -30,6 +30,15 @@ public class Grab : MonoBehaviour
 
     public bool NoPickUp;
 
+    /// <summary>
+    /// Enables or disables player grid input.
+    /// </summary>
+    public void SetInputEnabled(bool isEnabled)
+    {
+        NoPickUp = !isEnabled;
+        enabled = isEnabled;
+    }
+
 
     private void Start()
     {
@@ -171,11 +180,15 @@ public class Grab : MonoBehaviour
                 GridManager gm = GridManager.instance != null ? GridManager.instance : FindObjectOfType<GridManager>();
                 if (gm != null)
                 {
-                    Tile sourceTile = gm.GetTileForItem(currentlyDragging);
+                    Tile sourceTile = gm.RemoveItemFromAnyTile(currentlyDragging);
                     if (sourceTile != null)
                     {
-                        sourceTile.RemoveObject();
                         LastTileHit = sourceTile.gameObject;
+
+                        GroupOutlineController outlineController = GroupOutlineController.Instance != null
+                            ? GroupOutlineController.Instance
+                            : FindObjectOfType<GroupOutlineController>();
+                        outlineController?.ForceRefreshNow();
                     }
                 }
             }

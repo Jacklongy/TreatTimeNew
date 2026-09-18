@@ -251,6 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5fa671382eb3ff4fb1328d2a576deaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreLevel: 3
   OnGrid: 0
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}

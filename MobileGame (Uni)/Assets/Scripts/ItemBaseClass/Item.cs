@@ -12,7 +12,8 @@ using UnityEngine;
 /// </summary>
 public abstract class Item : MonoBehaviour
 {
-    GameOverseer overseer;
+    [Header("Score Settings")]
+    [SerializeField, Range(1, 4)] private int scoreLevel = 1;
 
     // Grid and Inventory
     public bool OnGrid = false;
@@ -20,12 +21,11 @@ public abstract class Item : MonoBehaviour
     SoundManagerScript sound;
     public GameObject particlesDrop;
     public GameObject particlesMerge;
-    public Animator Placed;
+    public string droppedSound;
 
     private void Awake()
     {
         sound = FindObjectOfType<SoundManagerScript>();
-        overseer = FindObjectOfType<GameOverseer>();
     }
 
     #region Grabbing and Merging
@@ -34,11 +34,11 @@ public abstract class Item : MonoBehaviour
 
         FindObjectOfType<SoundManagerScript>().Play("Grabbed");
 
-        if (overseer.Vibrations == true)
-        {
+        //if (overseer.Vibrations == true)
+       // {
             //HapticFeedback.LightFeedback();
             Debug.Log("Grabbed");
-        }
+      //  }
            
     }
 
@@ -52,11 +52,11 @@ public abstract class Item : MonoBehaviour
 
         // make sure to include base for all items. 
 
-        if (overseer.Vibrations == true)
-        {
+        //if (overseer.Vibrations == true)
+        //{
             Debug.Log("Vibrate");
             //HapticFeedback.MediumFeedback();
-        }
+        //}
         // you can impliment base functionality here 
         // but for specific tag use overide in item script. 
     }
@@ -66,15 +66,22 @@ public abstract class Item : MonoBehaviour
         return null;
     }
 
+    public virtual int ScoreLevel
+    {
+        get { return Mathf.Clamp(scoreLevel, 1, 4); }
+    }
+
+    public virtual bool IsCookedFood => false;
+
     public virtual void Dropped()
     {
         Instantiate(particlesDrop, gameObject.transform.position, gameObject.transform.rotation);
 
-        if (overseer != null && overseer.Vibrations == true)
-        {
+       // if (overseer != null && overseer.Vibrations == true)
+       // {
             Debug.Log("Vibrate");
             //HapticFeedback.MediumFeedback();
-        }
+       // }
 
         // this makes sure we hit the item instead of the tile first
         gameObject.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
@@ -82,9 +89,22 @@ public abstract class Item : MonoBehaviour
         OnGrid = true;
         gameObject.layer = 7;
 
+
+
+
+
         // sounds
         if (sound != null)
-            sound.Play("Place");
+        {
+            if(string.IsNullOrEmpty(droppedSound))
+            {
+                sound.Play("Place");
+            }
+            else
+            {
+                sound.Play(droppedSound);
+            }
+        }
     }
 
     public bool GridCheck()

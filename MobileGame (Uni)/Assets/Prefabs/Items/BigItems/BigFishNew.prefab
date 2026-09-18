@@ -773,10 +773,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daa4ab02ce0bc0e4eae8f81c70b16b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
+  Placed: {fileID: 0}
   Panic: {fileID: 5358085311742001426}
   Cooked: {fileID: 991399599403527306, guid: cd9eac201afbf1849bb1666327ac9671, type: 3}
   gridTag: FoodArea

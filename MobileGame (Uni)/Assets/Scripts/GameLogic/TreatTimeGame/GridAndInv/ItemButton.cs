@@ -88,20 +88,19 @@ public class ItemButton : MonoBehaviour
 
         Debug.Log($"Spawned {randomItemPrefab.name} on grid");
 
-        // Track presses and start cooldown when used up
-        pressesRemaining--;
-
-        // Update ring to show remaining presses
-        if (ProgressRing != null)
-        {
-            ProgressRing.fillAmount = (float)pressesRemaining / ButtonPresses;
-        }
-
-        if (pressesRemaining <= 0)
-        {
-            canSpawn = false;
-            StartCoroutine(CooldownRoutine());
-        }
+        // Cooldown temporarily disabled for playtesting.
+        // pressesRemaining--;
+        //
+        // if (ProgressRing != null)
+        // {
+        //     ProgressRing.fillAmount = (float)pressesRemaining / ButtonPresses;
+        // }
+        //
+        // if (pressesRemaining <= 0)
+        // {
+        //     canSpawn = false;
+        //     StartCoroutine(CooldownRoutine());
+        // }
     }
 
     private IEnumerator CooldownRoutine()
