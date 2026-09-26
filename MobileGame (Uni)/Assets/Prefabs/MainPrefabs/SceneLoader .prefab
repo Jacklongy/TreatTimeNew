@@ -150,7 +150,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!114 &959889285752664450
 MonoBehaviour:
@@ -278,7 +278,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Loading...
+  m_text: LOADING...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6ab40f0aa8b760340b42baa498d07260, type: 2}
   m_sharedMaterial: {fileID: -7216780291901671631, guid: 6ab40f0aa8b760340b42baa498d07260, type: 2}
@@ -393,4 +393,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transition: {fileID: 17533550372756111}
-  transTime: 1
+  transTime: 3

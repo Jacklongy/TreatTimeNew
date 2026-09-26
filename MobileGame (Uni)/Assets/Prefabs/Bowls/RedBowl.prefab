@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 5
   m_Sprite: {fileID: -1822112024931810888, guid: cb3ad3bc4f6060848b48c39800b2fa2e, type: 3}
-  m_Color: {r: 1, g: 0.3820755, b: 0.4670889, a: 1}
+  m_Color: {r: 0.9294118, g: 0.33333334, b: 0.3921569, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 4243006984161305160, guid: 5465575100ff1734aa4e70d1437bf29d, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
-  Placed: {fileID: 0}
+  droppedSound: 
   ItemInBowl: {fileID: 0}
   gridTag: BowlArea
   ItemInBowlTag: 
@@ -326,9 +326,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -153073551
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 03ce2801022053643a86196ec8e0926b, type: 3}
-  m_Color: {r: 1, g: 0.3820755, b: 0.4670889, a: 1}
+  m_Color: {r: 0.85098046, g: 0.27058825, b: 0.3254902, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

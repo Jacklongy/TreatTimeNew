@@ -9,6 +9,21 @@ using UnityEngine.UI;
 /// then for guests, collects player name and dog name. Signs in anonymously and sets
 /// the dashboard-visible player name. Returning players are signed in silently and
 /// sent straight to the menu.
+/// 
+/// This is the first script that sort of runs so ill type the saving flow here.
+/// - First, check if there is existing local save data.
+/// - If not, reset the player data to default.
+/// - Show the provider choice panel for sign-in.
+/// - For guest sign-in, collect player and dog names.
+/// - Sign in anonymously and save the names locally.
+/// - For returning players with existing data, sign in silently and go to the menu.
+/// This flow ensures that player data is always initialized and that returning players experience a seamless sign-in process.
+/// - We now have cloud save integration planned for after local save if they are connected to the internet.
+/// - If they are not connected to the internet, rely solely on the local save.
+/// - when they log in next time, the system will attempt to use the cloud save if available, otherwise it will fall back to the local save.
+/// - This ensures that the most recent progress is preserved across devices while maintaining a reliable local backup.
+/// - plan to set this up early october when i have Ai back to assist with the integration. 
+/// This will allow me to properly handle conflicts and ensure data consistency across local and cloud saves.
 /// </summary>
 public class SplashAccountController : MonoBehaviour
 {
@@ -114,23 +129,40 @@ public class SplashAccountController : MonoBehaviour
         confirmButton.interactable = false;
         ShowStatus("Setting up your account...");
 
+        // Sign in the player and set their name in the authentication system.
         await PlayerAuth.Instance.SignInAsync();
         await PlayerAuth.Instance.SetPlayerNameAsync(playerName);
 
+        // then save the player and dog names locally. Player data manager is just the data structure. Holding the data.
         PlayerDataManager.Instance.CurrentData.playername = playerName;
         PlayerDataManager.Instance.CurrentData.DogName = dogName;
+
+        // Local save service takes the current data from the player data manager and saves it locally.
+        //  To a JSON file on the device.
         LocalSaveService.Instance.Save();
 
+        // Plan going forward: integrate cloud save properly, By saving locally first, Check internet connectivity,
+        //  and then sync with the cloud.
+
+        // Check connectivity before attempting to save to the cloud.
+        // if not show pop up warning... 
+        // If successful, proceed with cloud save.
+        // we then want to check again for connectivity and ensure the cloud save was successful.
+        //  And take the recent local and save to cloud first.
+
+        CloudSave();
+
+        GoToMenu();
+    }
 
 
-        // Save to cloud if available. Testing if it works! we havnt set up pulling from the cloud yet.
+    private void CloudSave()
+    {
         if (CloudData.instance != null)
         {
             string json = JsonUtility.ToJson(PlayerDataManager.Instance.CurrentData);
             CloudData.instance.SaveData("PlayerProfile", json);
         }
-
-        GoToMenu();
     }
 
     private void GoToMenu()

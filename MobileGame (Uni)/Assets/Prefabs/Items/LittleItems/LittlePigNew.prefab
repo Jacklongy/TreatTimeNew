@@ -160,7 +160,7 @@ MonoBehaviour:
   scoreLevel: 1
   OnGrid: 0
   mySlot: {fileID: 0}
-  particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
+  particlesDrop: {fileID: 2022007913487994508, guid: 1b8d814f32c1abc44adfbf1a3a96a91e, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   LeftAwake: {fileID: 8251435251087106936}
@@ -265,6 +265,7 @@ GameObject:
   - component: {fileID: 5404073724282198239}
   - component: {fileID: 2121268142229058343}
   - component: {fileID: 6459826977976802210}
+  - component: {fileID: 4551035193196090693}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -282,7 +283,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.6364201, y: 1.6364201, z: 1.0227625}
+  m_LocalScale: {x: 1.63642, y: 1.6364201, z: 1.022763}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1853988312631289213}
@@ -356,7 +357,7 @@ Animator:
   m_GameObject: {fileID: 3816601315045732196}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9f866d9663e94164ca1031f9de9673c9, type: 2}
+  m_Controller: {fileID: 9100000, guid: d006b1352b483a245abc16a5555e6843, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -367,6 +368,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4551035193196090693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3816601315045732196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10da286a2c5b4ab46b5f9d38ea6131cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3853647917290629393
 GameObject:
   m_ObjectHideFlags: 0

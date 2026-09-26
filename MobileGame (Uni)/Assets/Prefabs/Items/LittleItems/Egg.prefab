@@ -105,7 +105,7 @@ MonoBehaviour:
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
-  Placed: {fileID: 0}
+  droppedSound: 
   nextObject: {fileID: 3083184210766972324, guid: a7a6d4399b3b38b4e9de241c40ce8ec8, type: 3}
   gridTag: FoodArea
 --- !u!114 &6720088662955933732
@@ -176,8 +176,9 @@ GameObject:
   - component: {fileID: 1018623855786694392}
   - component: {fileID: 3066103802280944843}
   - component: {fileID: 3116484090437882657}
+  - component: {fileID: 7077852455205387227}
   m_Layer: 0
-  m_Name: Egg (1)
+  m_Name: Egg image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -271,3 +272,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7077852455205387227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4291181555142668284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10da286a2c5b4ab46b5f9d38ea6131cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -331,19 +331,19 @@ MonoBehaviour:
   playTriggerName: Play
   levelStyles:
   - level: 1
-    color: {r: 0.9294118, g: 0.33333334, b: 0.3921569, a: 1}
+    color: {r: 0.37647063, g: 0.6039216, b: 0.9215687, a: 1}
     scaleMultiplier: 1
     burstEffectPrefab: {fileID: 0}
   - level: 2
-    color: {r: 0.3647059, g: 0.6117647, b: 0.92549026, a: 1}
+    color: {r: 0.28235295, g: 0.8117648, b: 0.68235296, a: 1}
     scaleMultiplier: 1
     burstEffectPrefab: {fileID: 0}
   - level: 3
-    color: {r: 0.627451, g: 0.8313726, b: 0.40784317, a: 1}
+    color: {r: 0.6745098, g: 0.57254905, b: 0.9294118, a: 1}
     scaleMultiplier: 1
     burstEffectPrefab: {fileID: 0}
   - level: 4
-    color: {r: 0.6745098, g: 0.5686275, b: 0.9333334, a: 1}
+    color: {r: 0.9294118, g: 0.33333334, b: 0.3921569, a: 1}
     scaleMultiplier: 1
     burstEffectPrefab: {fileID: 0}
 --- !u!95 &4207068360931227039

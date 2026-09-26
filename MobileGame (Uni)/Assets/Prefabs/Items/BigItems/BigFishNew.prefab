@@ -269,7 +269,7 @@ Animator:
   m_GameObject: {fileID: 3383912468027647083}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 64e2475e4e36a05479ce728c6d5d6e37, type: 2}
+  m_Controller: {fileID: 9100000, guid: 49cddb7e65e9b474299463b76fb56969, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -778,7 +778,7 @@ MonoBehaviour:
   mySlot: {fileID: 0}
   particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
-  Placed: {fileID: 0}
+  droppedSound: 
   Panic: {fileID: 5358085311742001426}
   Cooked: {fileID: 991399599403527306, guid: cd9eac201afbf1849bb1666327ac9671, type: 3}
   gridTag: FoodArea
