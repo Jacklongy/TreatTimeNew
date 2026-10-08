@@ -19,18 +19,18 @@ public class MainMenuXPDisplay : MonoBehaviour
 
     /// <summary>
     /// Reads the current profile and updates the level/XP display.
-    /// Call this after PlayerDataManager has loaded/reset the profile.
+    /// Call this after PlayerProfileHolder has loaded/reset the profile.
     /// </summary>
     public void Refresh()
     {
-        if (PlayerDataManager.Instance == null || xpCurveConfig == null)
+        if (PlayerProfileHolder.Instance == null || xpCurveConfig == null)
         {
 
            
             return;
         }
 
-        var data = PlayerDataManager.Instance.CurrentData;
+        var data = PlayerProfileHolder.Instance.CurrentData;
 
         Debug.Log($"Current Level: {data.CurrentLevel}, Total XP: {data.TotalXP}");
 

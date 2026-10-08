@@ -22,9 +22,9 @@ public class NewRunManager : MonoBehaviour
 
     private void Start()
     {
-        if (PlayerDataManager.Instance == null)
+        if (PlayerProfileHolder.Instance == null)
         {
-            Debug.LogError("PlayerDataManager missing.");
+            Debug.LogError("PlayerProfileHolder missing.");
             return;
         }
 
@@ -40,7 +40,7 @@ public class NewRunManager : MonoBehaviour
     /// </summary>
     public void LoadProfileIntoGameRun()
     {
-        var data = PlayerDataManager.Instance.CurrentData;
+        var data = PlayerProfileHolder.Instance.CurrentData;
 
         if (xpManager != null)
         {
@@ -54,10 +54,10 @@ public class NewRunManager : MonoBehaviour
     /// </summary>
     public void SaveRun()
     {
-        if (PlayerDataManager.Instance == null)
+        if (PlayerProfileHolder.Instance == null)
             return;
 
-        var data = PlayerDataManager.Instance.CurrentData;
+        var data = PlayerProfileHolder.Instance.CurrentData;
         data.HighScoreTimed = Mathf.Max(data.HighScoreTimed, CurrentRunScore);
 
         if (coinManager != null)
@@ -71,9 +71,7 @@ public class NewRunManager : MonoBehaviour
             data.CurrentLevel = xpManager.ProfileLevelAfterRun;
         }
 
-        if (LocalSaveService.Instance != null)
-        {
-            LocalSaveService.Instance.Save();
-        }
+        // Saves locally right away; the cloud push runs in the background when online.
+        _ = ProfileSyncService.SaveAndSyncAsync();
     }
 }

@@ -4,7 +4,7 @@ using System;
 /// Serializable local player data. It contains values only; managers and save services own the behavior.
 /// </summary>
 [Serializable]
-public class PlayerDataLocal
+public class PlayerProfileData
 {
     public string playername; 
     public string DogName;
@@ -22,7 +22,14 @@ public class PlayerDataLocal
     public bool HasPlayed;
     public bool VibrationsEnabled;
 
-    public PlayerDataLocal()
+    // Sync bookkeeping, used instead of device clocks. Bumped on every local save.
+    public int SaveRevision;
+    // Last revision known to be stored in the cloud. SaveRevision > SyncedRevision means unsynced changes.
+    public int SyncedRevision;
+
+    public bool HasUnsyncedChanges => SaveRevision > SyncedRevision;
+
+    public PlayerProfileData()
     {
         playername = "";
         DogName = "Default";
@@ -36,5 +43,7 @@ public class PlayerDataLocal
         HighScoreUnlimited = 0;
         HasPlayed = false;
         VibrationsEnabled = true;
+        SaveRevision = 0;
+        SyncedRevision = 0;
     }
 }

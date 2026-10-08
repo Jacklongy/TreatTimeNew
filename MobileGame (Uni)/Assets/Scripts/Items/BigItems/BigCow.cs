@@ -28,7 +28,7 @@ public class BigCow : Item
         LeftAwake.SetBool("Grabbed", true);
         RightAwake.SetBool("Grabbed", true);
         Feet.SetBool("Grabbed", true);
-        Panic.SetBool("Grabbed", true);
+        SetPanicState(Panic, true);
         #endregion
 
         base.Grabbed();
@@ -62,7 +62,8 @@ public class BigCow : Item
         LeftAwake.SetBool("Grabbed", false);
         RightAwake.SetBool("Grabbed", false);
         Feet.SetBool("Grabbed", false);
-        Panic.SetBool("Grabbed", false);
+        SetPanicState(Panic, false);
         #endregion
+        base.ResetAnim();
     }
 }

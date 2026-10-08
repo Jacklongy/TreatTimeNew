@@ -27,7 +27,7 @@ public class littleFish : Item
     #region Grabbing and Merging
     public override void Grabbed()
     {
-        Panic.SetBool("Grabbed", true);
+        SetPanicState(Panic, true);
         base.Grabbed();
     }
 
@@ -48,17 +48,10 @@ public class littleFish : Item
             Destroy(gameObject);
         }
     }
-
-    public override void Dropped()
-    {
-        base.Dropped();
-
-        // Custom Drop Sound
-    }
-
     public override void ResetAnim()
     {
-        Panic.SetBool("Grabbed", false);
+        SetPanicState(Panic, false);
+        base.ResetAnim();
     }
     #endregion
 }

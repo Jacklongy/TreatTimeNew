@@ -1,14 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// Owns the live PlayerDataLocal instance for the current application session. 
+/// Owns the live PlayerProfileData instance for the current application session. 
 /// </summary>
-public class PlayerDataManager : MonoBehaviour
+public class PlayerProfileHolder : MonoBehaviour
 {
-	public static PlayerDataManager Instance;
+	public static PlayerProfileHolder Instance;
 
 	[Header("Player Data")]
-	public PlayerDataLocal CurrentData;
+	public PlayerProfileData CurrentData;
 
 	private void Awake()
 	{
@@ -24,14 +24,14 @@ public class PlayerDataManager : MonoBehaviour
 
 		if (CurrentData == null)
 		{
-			CurrentData = new PlayerDataLocal();
+			CurrentData = new PlayerProfileData();
 		}
 	}
 
 	/// <summary>
 	/// Replaces the current data after a save service has loaded a player profile.
 	/// </summary>
-	public void SetData(PlayerDataLocal data)
+	public void SetData(PlayerProfileData data)
 	{
 		if (data == null)
 		{
@@ -47,7 +47,7 @@ public class PlayerDataManager : MonoBehaviour
 	/// </summary>
 	public void ResetData()
 	{
-		CurrentData = new PlayerDataLocal();
+		CurrentData = new PlayerProfileData();
 	}
 
 	private void OnDestroy()

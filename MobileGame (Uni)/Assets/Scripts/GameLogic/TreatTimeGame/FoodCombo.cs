@@ -12,6 +12,13 @@ public class FoodCombo : MonoBehaviour
     public Transform ShowFood;
     public Transform ShowBowl;
 
+    [Header("Next Meal Preview")]
+    public Transform NextShowFood;
+    public Transform NextShowBowl;
+    [Tooltip("Parent of both preview slots; scaled so food and bowl stay aligned.")]
+    [SerializeField] private Transform nextPreviewRoot;
+    [SerializeField, Range(0.1f, 1f)] private float nextPreviewScale = 0.6f;
+
     // List of Sprites
     public GameObject[] FoodImages;
     public GameObject[] BowlImages;
@@ -23,6 +30,10 @@ public class FoodCombo : MonoBehaviour
 
     private void Awake()
     {
+        if (nextPreviewRoot != null)
+        {
+            nextPreviewRoot.localScale = Vector3.one * nextPreviewScale;
+        }
 
         FoodImageTags = new Dictionary<string, GameObject>();
         BowlImageTags = new Dictionary<string, GameObject>();
@@ -49,11 +60,32 @@ public class FoodCombo : MonoBehaviour
     }
 
     /// <summary>
-    /// maybe for showing next meal. 
+    /// Shows the upcoming meal in the preview slots, replacing any previous preview.
     /// </summary>
-    public void NextMealPeak()
+    public void DisplayNextFood(string food, string bowl)
     {
+        if (NextShowFood == null || NextShowBowl == null) return;
 
+        ClearChildren(NextShowFood);
+        ClearChildren(NextShowBowl);
+
+        if (FoodImageTags.TryGetValue(food, out GameObject foodImage))
+        {
+            Instantiate(foodImage, NextShowFood);
+        }
+
+        if (BowlImageTags.TryGetValue(bowl, out GameObject bowlImage))
+        {
+            Instantiate(bowlImage, NextShowBowl);
+        }
+    }
+
+    private static void ClearChildren(Transform parent)
+    {
+        foreach (Transform child in parent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public void NextMeal()

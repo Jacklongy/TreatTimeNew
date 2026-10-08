@@ -28,7 +28,7 @@ public class BigPig : Item
         RightAwake.SetBool("Grabbed", true);
         LeftLeg.SetBool("Grabbed", true);
         RightLeg.SetBool("Grabbed", true);
-        Panic.SetBool("Grabbed", true);
+        SetPanicState(Panic, true);
         #endregion
         base.Grabbed();
     }
@@ -60,7 +60,8 @@ public class BigPig : Item
         RightAwake.SetBool("Grabbed", false);
         LeftLeg.SetBool("Grabbed", false);
         RightLeg.SetBool("Grabbed", false);
-        Panic.SetBool("Grabbed", false);
+        SetPanicState(Panic, false);
         #endregion
+        base.ResetAnim();
     }
 }

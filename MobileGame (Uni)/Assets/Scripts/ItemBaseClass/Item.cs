@@ -23,14 +23,56 @@ public abstract class Item : MonoBehaviour
     public GameObject particlesMerge;
     public string droppedSound;
 
+    [Header("Grab Visuals")]
+    public Animator shadowAnimator;
+    [Range(1f, 2f)] public float grabbedScaleMultiplier = 1.05f;
+    [Range(0.05f, 0.5f)] public float grabScaleDuration = 0.15f;
+    [Range(0.05f, 1f)] public float spawnFrontDuration = 0.25f;
+
+    private Vector3 originalLocalScale;
+
     private void Awake()
     {
         sound = FindObjectOfType<SoundManagerScript>();
+        originalLocalScale = transform.localScale;
+        if (shadowAnimator != null)
+        {
+            shadowAnimator = shadowAnimator.GetComponent<Animator>();
+        }
+
+        StartCoroutine(SpawnInFront());
+    }
+
+    private IEnumerator SpawnInFront()
+    {
+        SetSortingLayer("Dragging");
+        yield return new WaitForSeconds(spawnFrontDuration);
+        SetSortingLayer("foreGround");
+    }
+
+    private void SetSortingLayer(string layerName)
+    {
+        foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            spriteRenderer.sortingLayerName = layerName;
+        }
+    }
+
+    private void TweenToScale(Vector3 targetScale)
+    {
+        LeanTween.cancel(gameObject, false, TweenAction.SCALE);
+        LeanTween.scale(gameObject, targetScale, grabScaleDuration).setEase(LeanTweenType.easeOutQuad);
     }
 
     #region Grabbing and Merging
     public virtual void Grabbed()
     {
+        TweenToScale(originalLocalScale * grabbedScaleMultiplier);
+
+        if (shadowAnimator != null)
+        {
+            shadowAnimator.SetBool("Grabbed", true);
+        }
 
         FindObjectOfType<SoundManagerScript>().Play("Grabbed");
 
@@ -75,6 +117,13 @@ public abstract class Item : MonoBehaviour
 
     public virtual void Dropped()
     {
+        TweenToScale(originalLocalScale);
+
+        if (shadowAnimator != null)
+        {
+            shadowAnimator.SetBool("Grabbed", false);
+        }
+
         Instantiate(particlesDrop, gameObject.transform.position, gameObject.transform.rotation);
 
        // if (overseer != null && overseer.Vibrations == true)
@@ -148,9 +197,17 @@ public abstract class Item : MonoBehaviour
 
     #region Animations
 
+    protected void SetPanicState(Animator panicAnimator, bool isGrabbed)
+    {
+        if (panicAnimator != null)
+        {
+            panicAnimator.SetBool("Grabbed", isGrabbed);
+        }
+    }
+
     public virtual void ResetAnim()
     {
-       
+        TweenToScale(originalLocalScale);
         Debug.Log("no Anim");
     }
     #endregion

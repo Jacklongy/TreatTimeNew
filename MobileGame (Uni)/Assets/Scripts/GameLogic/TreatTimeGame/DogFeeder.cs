@@ -13,6 +13,8 @@ public class DogFeeder : MonoBehaviour
     public string[] bowls;
     public string ChosenFood;
     public string ChosenBowl;
+    private string nextFood;
+    private string nextBowl;
 
     [Header("Displays")]
     public GameObject display;
@@ -70,9 +72,22 @@ public class DogFeeder : MonoBehaviour
         // randomy pick a gameObject/ item and a bowl color. 
         // go to food wanted script and display the sprites that match with the current combo. 
         ChosenFood = Foods[Random.Range(0, Foods.Length)];
-        ChosenBowl = bowls[Random.Range(0, Foods.Length)];
+        ChosenBowl = bowls[Random.Range(0, bowls.Length)];
 
         display.GetComponent<FoodCombo>().DisplayWantedFood(ChosenFood, ChosenBowl);
+
+        RollNextCombo();
+    }
+
+    /// <summary>
+    /// Picks the combo after the current one and shows it in the preview.
+    /// </summary>
+    private void RollNextCombo()
+    {
+        nextFood = Foods[Random.Range(0, Foods.Length)];
+        nextBowl = bowls[Random.Range(0, bowls.Length)];
+
+        foodComboRef.DisplayNextFood(nextFood, nextBowl);
     }
 
     /// <summary>
@@ -91,10 +106,12 @@ public class DogFeeder : MonoBehaviour
     /// </summary>
     void DisplayNewFood()
     {
-        ChosenFood = Foods[Random.Range(0, Foods.Length)];
-        ChosenBowl = bowls[Random.Range(0, Foods.Length)];
+        ChosenFood = nextFood;
+        ChosenBowl = nextBowl;
 
         display.GetComponent<FoodCombo>().DisplayWantedFood(ChosenFood, ChosenBowl);
+
+        RollNextCombo();
     }
 
     void Update()

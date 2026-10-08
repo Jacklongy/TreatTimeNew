@@ -1,29 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+/// <summary>
+/// Scrolls a tiling texture on a RawImage by offsetting its UV rect, so it loops seamlessly.
+/// </summary>
+[RequireComponent(typeof(RawImage))]
 public class XPbar : MonoBehaviour
 {
-    [SerializeField] private float scrollSpeed = 50f;
-    [SerializeField] private float resetPosition = 500f;
-    [SerializeField] private float startPosition = 0f;
+    [Tooltip("Tiles scrolled per second. Positive moves right.")]
+    [SerializeField] private float scrollSpeed = 0.2f;
 
-    private RectTransform rectTransform;
+    private RawImage rawImage;
 
     private void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
+        rawImage = GetComponent<RawImage>();
     }
 
     private void Update()
     {
-        rectTransform.anchoredPosition += Vector2.right * scrollSpeed * Time.deltaTime;
-
-        if (rectTransform.anchoredPosition.x >= resetPosition)
-        {
-            Vector2 position = rectTransform.anchoredPosition;
-            position.x = startPosition;
-            rectTransform.anchoredPosition = position;
-        }
+        Rect uv = rawImage.uvRect;
+        // Moving the UV window left makes the image appear to move right.
+        uv.x = Mathf.Repeat(uv.x - scrollSpeed * Time.deltaTime, 1f);
+        rawImage.uvRect = uv;
     }
 }

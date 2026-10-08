@@ -19,22 +19,22 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
     [SerializeField] private TextMeshProUGUI DogNameText;
 
     /// <summary>
-    /// Checks if the PlayerDataManager is present in the scene and loads the player data.
+    /// Checks if the PlayerProfileHolder is present in the scene and loads the player data.
     /// If no save file is found, it creates default data.
     /// </summary>
     private void Start()
     {
-        if (PlayerDataManager.Instance == null)
+        if (PlayerProfileHolder.Instance == null)
         {
-            Debug.LogError("PlayerDataManager is missing from the scene.");
+            Debug.LogError("PlayerProfileHolder is missing from the scene.");
             return;
         }
 
-        bool loaded = LocalSaveService.Instance != null && LocalSaveService.Instance.Load();
+        bool loaded = LocalSaveStorage.Instance != null && LocalSaveStorage.Instance.Load();
 
         if (!loaded)
         {
-            PlayerDataManager.Instance.ResetData();
+            PlayerProfileHolder.Instance.ResetData();
             Debug.Log("No save file found. Created default data.");
         }
 
@@ -42,12 +42,12 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
 
         if (PlayerNameText != null)
         {
-            PlayerNameText.text = PlayerDataManager.Instance.CurrentData.playername;
+            PlayerNameText.text = PlayerProfileHolder.Instance.CurrentData.playername;
         }
 
         if (DogNameText != null)
         {
-            DogNameText.text = PlayerDataManager.Instance.CurrentData.DogName;
+            DogNameText.text = PlayerProfileHolder.Instance.CurrentData.DogName;
         }
     }
 
@@ -57,15 +57,12 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
 /// </summary>
     public void StartGame()
     {
-        if (PlayerDataManager.Instance == null)
+        if (PlayerProfileHolder.Instance == null)
             return;
 
-        PlayerDataManager.Instance.CurrentData.HasPlayed = true;
+        PlayerProfileHolder.Instance.CurrentData.HasPlayed = true;
 
-        if (LocalSaveService.Instance != null)
-        {
-            LocalSaveService.Instance.Save();
-        }
+        _ = ProfileSyncService.SaveAndSyncAsync();
 
         SceneController.Instance.LoadScene("TreatTimeNew");
     }

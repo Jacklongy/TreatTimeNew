@@ -20,7 +20,7 @@ public class BigFish : Item
 
     public override void Grabbed()
     {
-        Panic.SetBool("Grabbed", true);
+        SetPanicState(Panic, true);
         base.Grabbed();
     }
 
@@ -47,6 +47,7 @@ public class BigFish : Item
 
     public override void ResetAnim()
     {
-        Panic.SetBool("Grabbed", false);
+        SetPanicState(Panic, false);
+        base.ResetAnim();
     }
 }

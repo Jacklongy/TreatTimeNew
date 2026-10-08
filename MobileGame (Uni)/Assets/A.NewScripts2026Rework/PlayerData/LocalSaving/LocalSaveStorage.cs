@@ -3,11 +3,11 @@ using System.IO;
 using UnityEngine;
 
 /// <summary>
-/// Reads and writes PlayerDataLocal to the device's persistent local storage.
+/// Reads and writes PlayerProfileData to the device's persistent local storage.
 /// </summary>
-public class LocalSaveService : MonoBehaviour
+public class LocalSaveStorage : MonoBehaviour
 {
-    public static LocalSaveService Instance;
+    public static LocalSaveStorage Instance;
 
     private const string SaveFileName = "player_data.json";
 
@@ -32,23 +32,24 @@ public class LocalSaveService : MonoBehaviour
     }
 
     /// <summary>
-    /// Saves the current profile owned by PlayerDataManager.
+    /// Saves the current profile owned by PlayerProfileHolder.
     /// </summary>
     public bool Save()
     {
-        if (PlayerDataManager.Instance == null || PlayerDataManager.Instance.CurrentData == null)
+        if (PlayerProfileHolder.Instance == null || PlayerProfileHolder.Instance.CurrentData == null)
         {
-            Debug.LogError("Cannot save because PlayerDataManager has no current data.");
+            Debug.LogError("Cannot save because PlayerProfileHolder has no current data.");
             return false;
         }
 
-        return Save(PlayerDataManager.Instance.CurrentData);
+        return Save(PlayerProfileHolder.Instance.CurrentData);
     }
 
     /// <summary>
     /// Saves a supplied profile as formatted JSON on the device.
+    /// Pass markModified false only when persisting sync bookkeeping, so the save isn't counted as a new change.
     /// </summary>
-    public bool Save(PlayerDataLocal data)
+    public bool Save(PlayerProfileData data, bool markModified = true)
     {
         if (data == null)
         {
@@ -58,6 +59,11 @@ public class LocalSaveService : MonoBehaviour
 
         try
         {
+            if (markModified)
+            {
+                data.SaveRevision++;
+            }
+
             string json = JsonUtility.ToJson(data, true);
             File.WriteAllText(SavePath, json);
             return true;
@@ -70,7 +76,7 @@ public class LocalSaveService : MonoBehaviour
     }
 
     /// <summary>
-    /// Loads a profile and gives it to PlayerDataManager.
+    /// Loads a profile and gives it to PlayerProfileHolder.
     /// </summary>
     public bool Load()
     {
@@ -82,7 +88,7 @@ public class LocalSaveService : MonoBehaviour
         try
         {
             string json = File.ReadAllText(SavePath);
-            PlayerDataLocal data = JsonUtility.FromJson<PlayerDataLocal>(json);
+            PlayerProfileData data = JsonUtility.FromJson<PlayerProfileData>(json);
 
             if (data == null)
             {
@@ -90,13 +96,13 @@ public class LocalSaveService : MonoBehaviour
                 return false;
             }
 
-            if (PlayerDataManager.Instance == null)
+            if (PlayerProfileHolder.Instance == null)
             {
-                Debug.LogError("Cannot load because PlayerDataManager is missing.");
+                Debug.LogError("Cannot load because PlayerProfileHolder is missing.");
                 return false;
             }
 
-            PlayerDataManager.Instance.SetData(data);
+            PlayerProfileHolder.Instance.SetData(data);
             return true;
         }
         catch (Exception exception)
