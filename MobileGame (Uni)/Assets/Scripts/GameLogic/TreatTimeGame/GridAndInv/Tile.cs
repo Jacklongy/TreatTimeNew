@@ -78,7 +78,10 @@ public class Tile : MonoBehaviour
         }
 
         spaceOutline.ApplyColor(color);
-        spaceOutline.ApplySortingOrder(sortingOrder);
+        SpriteRenderer tileRenderer = GetComponent<SpriteRenderer>();
+        int tileOrder = tileRenderer != null ? tileRenderer.sortingOrder : 0;
+        // Borders must always render above the tile; level keeps ordering between outline levels.
+        spaceOutline.ApplySortingOrder(tileOrder + Mathf.Max(1, sortingOrder));
         spaceOutline.UpdateBorders(top, bottom, left, right);
     }
 

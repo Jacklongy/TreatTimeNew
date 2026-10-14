@@ -14,6 +14,9 @@ public class NewScoreManager : MonoBehaviour
 
     public int CurrentScore { get; private set; }
 
+    // (amount added, whether it came from feeding the dog during a combo)
+    public event System.Action<int, bool> ScoreAdded;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -33,7 +36,7 @@ public class NewScoreManager : MonoBehaviour
     /// <summary>
     /// Adds earned score to the run total, from any source (grid ticks, feeding, etc).
     /// </summary>
-    public void AddScore(int amount)
+    public void AddScore(int amount, bool comboFeed = false)
     {
         if (amount <= 0)
         {
@@ -42,6 +45,7 @@ public class NewScoreManager : MonoBehaviour
 
         CurrentScore += amount;
         RefreshScoreDisplay();
+        ScoreAdded?.Invoke(amount, comboFeed);
     }
 
     /// <summary>

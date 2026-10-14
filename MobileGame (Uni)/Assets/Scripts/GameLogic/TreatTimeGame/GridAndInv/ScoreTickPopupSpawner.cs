@@ -1,55 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 /// <summary>
 /// Listens to GridScoringSystem tick events and spawns floating "+score" popups.
 /// - Subscribes to TickAwardsCalculated event
-/// - Draws popups from a pool per tile (or per group)
+/// - Takes popups from ScoreTickPopupPool (same GameObject by default)
 /// - Adds score to NewScoreManager at the moment each popup spawns
 /// </summary>
 public class ScoreTickPopupSpawner : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GridScoringSystem scoreSystem;
-    [SerializeField] private ScoreTickPopup popupPrefab;
-    [SerializeField] private Transform popupParent;
+    [SerializeField] private ScoreTickPopupPool popupPool;
 
     [Header("Spawn Behavior")]
     [SerializeField] private bool spawnOnEachTile = true;
     [SerializeField, Min(0f)] private float perTileSpawnDelay = 0.2f;
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 0.35f, 0f);
-    [SerializeField, Min(0f)] private float randomJitter = 0.06f;
-
-    [Header("Pooling")]
-    [SerializeField, Min(1)] private int poolDefaultCapacity = 20;
-    [SerializeField, Min(1)] private int poolMaxSize = 200;
 
     [Header("Debug")]
     [SerializeField] private bool logSpawns;
 
-    private ObjectPool<ScoreTickPopup> popupPool;
     private WaitForSeconds tileDelay; // cached to avoid a GC alloc every staggered spawn
 
     private void Awake()
     {
-        popupPool = new ObjectPool<ScoreTickPopup>(
-            createFunc: () =>
-            {
-                ScoreTickPopup popup = Instantiate(popupPrefab, popupParent);
-                popup.SetOwner(this);
-                return popup;
-            },
-            actionOnGet: popup => popup.gameObject.SetActive(true),
-            actionOnRelease: popup => popup.gameObject.SetActive(false),
-            actionOnDestroy: popup =>
-            {
-                if (popup != null) Destroy(popup.gameObject);
-            },
-            collectionCheck: false,
-            defaultCapacity: poolDefaultCapacity,
-            maxSize: poolMaxSize);
+        if (popupPool == null)
+        {
+            popupPool = GetComponent<ScoreTickPopupPool>();
+        }
 
         if (perTileSpawnDelay > 0f)
         {
@@ -64,11 +44,6 @@ public class ScoreTickPopupSpawner : MonoBehaviour
             scoreSystem = GridScoringSystem.Instance != null
                 ? GridScoringSystem.Instance
                 : FindObjectOfType<GridScoringSystem>();
-        }
-
-        if (popupParent == null)
-        {
-            popupParent = transform;
         }
 
         if (scoreSystem != null)
@@ -87,7 +62,7 @@ public class ScoreTickPopupSpawner : MonoBehaviour
 
     private void OnTickAwardsCalculated(IReadOnlyList<GridScoringSystem.GroupTickAward> awards, int tickTotal)
     {
-        if (popupPrefab == null || awards == null || awards.Count == 0)
+        if (popupPool == null || awards == null || awards.Count == 0)
         {
             return;
         }
@@ -142,24 +117,14 @@ public class ScoreTickPopupSpawner : MonoBehaviour
 
     private void SpawnSingle(int amount, int level, Vector3 origin)
     {
-        Vector2 jitter2D = Random.insideUnitCircle * randomJitter;
-        Vector3 spawnPosition = origin + worldOffset + (Vector3)jitter2D;
+        Vector3 spawnPosition = origin + worldOffset;
 
-        ScoreTickPopup popup = popupPool.Get();
-        popup.transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
+        ScoreTickPopup popup = popupPool.Get(spawnPosition, Quaternion.identity);
         popup.Play(amount, level);
 
         if (NewScoreManager.Instance != null)
         {
             NewScoreManager.Instance.AddScore(amount);
         }
-    }
-
-    /// <summary>
-    /// Returns a finished popup to the pool. Called by ScoreTickPopup when its animation exits.
-    /// </summary>
-    public void ReleasePopup(ScoreTickPopup popup)
-    {
-        popupPool.Release(popup);
     }
 }

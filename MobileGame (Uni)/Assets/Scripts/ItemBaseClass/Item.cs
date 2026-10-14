@@ -25,8 +25,8 @@ public abstract class Item : MonoBehaviour
 
     [Header("Grab Visuals")]
     public Animator shadowAnimator;
-    [Range(1f, 2f)] public float grabbedScaleMultiplier = 1.05f;
-    [Range(0.05f, 0.5f)] public float grabScaleDuration = 0.15f;
+    [Range(1f, 2f)] public float grabbedScaleMultiplier = 1.15f;
+    [Range(0.05f, 0.5f)] public float grabScaleDuration = 0.2f;
     [Range(0.05f, 1f)] public float spawnFrontDuration = 0.25f;
 
     private Vector3 originalLocalScale;
@@ -65,6 +65,22 @@ public abstract class Item : MonoBehaviour
     }
 
     #region Grabbing and Merging
+    private void PlayParticles(GameObject prefab)
+    {
+        if (prefab == null)
+        {
+            return;
+        }
+
+        if (ParticlePool.Instance != null)
+        {
+            ParticlePool.Instance.Play(prefab, transform.position, transform.rotation);
+        }
+        else
+        {
+            Instantiate(prefab, transform.position, transform.rotation);
+        }
+    }
     public virtual void Grabbed()
     {
         TweenToScale(originalLocalScale * grabbedScaleMultiplier);
@@ -88,7 +104,7 @@ public abstract class Item : MonoBehaviour
     {
 
         // Particle effects
-        Instantiate(particlesMerge, gameObject.transform.position, gameObject.transform.rotation);
+        PlayParticles(particlesMerge);
 
         FindObjectOfType<SoundManagerScript>().Play("Merge");
 
@@ -124,7 +140,7 @@ public abstract class Item : MonoBehaviour
             shadowAnimator.SetBool("Grabbed", false);
         }
 
-        Instantiate(particlesDrop, gameObject.transform.position, gameObject.transform.rotation);
+        PlayParticles(particlesDrop);
 
        // if (overseer != null && overseer.Vibrations == true)
        // {

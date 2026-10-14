@@ -167,6 +167,14 @@ public class GridManager : MonoBehaviour
             return null;
         }
 
+        // Bowls only group with the same bowl colour AND the same food inside.
+        Bowl bowl = tile.ObjectContainer.GetComponent<Bowl>();
+        if (bowl != null)
+        {
+            string food = bowl.ItemInBowl != null ? bowl.ItemInBowl.tag : "Empty";
+            return tile.ObjectContainer.tag + "+" + food;
+        }
+
         return tile.ObjectContainer.tag;
     }
 

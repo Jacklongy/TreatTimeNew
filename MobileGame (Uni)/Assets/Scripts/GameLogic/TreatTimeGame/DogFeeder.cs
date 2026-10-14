@@ -25,11 +25,40 @@ public class DogFeeder : MonoBehaviour
     public GameObject Quit;
     public GameObject Win;
 
+// this still needs implimenting.
     [Header("Pop Ups")]
     public GameObject WrongFoodPopUp;
+   
+    [Header("Combo Settings")]
     public GameObject ComboPopUp;
-    public TextMeshPro ComboDisplay;
+    public TextMeshProUGUI ComboDisplay;
+    public Animator ComboAnimator;  
 
+    [Header("Combo Look (per combo above x2)")]
+    public float speedPerCombo = 0.25f;                  // animation speed added each combo
+    public float maxSpeed = 3f;
+    public float sizePerCombo = 0.1f;                    // scale added each combo
+    public float maxSize = 1.6f;
+    public Color[] comboColors = { Color.white, Color.yellow, new Color(1f, 0.6f, 0f), Color.red }; // element 0 = x2, 1 = x3 ... last one is reused above
+    public int rainbowFromCombo = 8;                     // combo at which the text switches to rainbow
+    public float rainbowSpeed = 2f;                      // rainbow cycles per second
+    public Color[] rainbowColors =                       // palette the rainbow blends through, loops back to the first
+    {
+        new Color32(0xED, 0x55, 0x65, 255),  // grapefruit
+        new Color32(0xFC, 0x6E, 0x51, 255),  // bittersweet
+        new Color32(0xFF, 0xCE, 0x54, 255),  // sunflower
+        new Color32(0xA0, 0xD4, 0x68, 255),  // grass
+        new Color32(0x48, 0xCF, 0xAD, 255),  // mint
+        new Color32(0x4F, 0xC1, 0xE9, 255),  // aqua
+        new Color32(0x5D, 0x9C, 0xEC, 255),  // blue jeans
+        new Color32(0xAC, 0x92, 0xEC, 255),  // lavender
+        new Color32(0xEC, 0x87, 0xC0, 255),  // pink rose
+    };
+    public bool debugForceRainbow = false;               // debug: rainbow on for any combo of x2 or more
+
+    private Vector3 comboStartScale;
+
+    // i also need to adjust how these look.
     [Header("Particles")]
     public GameObject Particles;
     public GameObject ParticlePoint;
@@ -43,7 +72,7 @@ public class DogFeeder : MonoBehaviour
     public float hungerDecayRate = 0.25f; // How fast hunger depletes per second
     public float hungerGainPerMeal = 0.50f; // How much hunger increases per correct meal
     public float comboTimer;
-
+    public float comboGraceTime = 0.3f; // extra time after the window ends, so late physics events still count
     [Header("Feeding Score")]
     [SerializeField, Min(1)] private int feedingBaseAward = 100;
     [SerializeField, Min(0)] private int coinsPerMeal = 5;
@@ -68,6 +97,7 @@ public class DogFeeder : MonoBehaviour
     {
         comboTimer = 10f;
         comboAmount = 0;
+        comboStartScale = ComboPopUp.transform.localScale;
 
         // randomy pick a gameObject/ item and a bowl color. 
         // go to food wanted script and display the sprites that match with the current combo. 
@@ -131,12 +161,15 @@ public class DogFeeder : MonoBehaviour
                     // Display pop up. 
                     ComboPopUp.SetActive(true);
                     ComboDisplay.text = ("X" + comboAmount);
-                }
 
-               
+                    if (comboAmount >= rainbowFromCombo || debugForceRainbow)
+                    {
+                        ComboDisplay.color = GetRainbowColor(rainbowSpeed);
+                    }
+                }
             }
 
-            if (comboTimer <= 0f)
+            if (comboTimer <= -comboGraceTime)
             {
                 ComboPopUp.SetActive(false);
 
@@ -191,6 +224,51 @@ public class DogFeeder : MonoBehaviour
         
     }
 
+    // Read by other scripts (e.g. ScoreTextCombo). Active uses the same rule as the popup.
+    public int ComboAmount => comboAmount;
+    public bool ComboActive => ComboStart && comboAmount >= 2;
+
+    // Same colour the popup text uses, including the rainbow.
+    public Color GetCurrentComboColor()
+    {
+        if (comboAmount >= rainbowFromCombo || debugForceRainbow)
+        {
+            return GetRainbowColor(rainbowSpeed);
+        }
+
+        if (comboColors.Length == 0)
+        {
+            return Color.white;
+        }
+
+        return comboColors[Mathf.Clamp(comboAmount - 2, 0, comboColors.Length - 1)];
+    }
+
+    private Color GetRainbowColor(float cyclesPerSecond)
+    {
+        float position = Mathf.Repeat(Time.time * cyclesPerSecond, 1f) * rainbowColors.Length;
+        int index = Mathf.FloorToInt(position);
+
+        return Color.Lerp(rainbowColors[index], rainbowColors[(index + 1) % rainbowColors.Length], position - index);
+    }
+
+    private void UpdateComboLook()
+    {
+        int extra = comboAmount - 2;   // 0 at x2, 1 at x3, and so on
+
+        // Speed
+        ComboAnimator.speed = Mathf.Min(1f + extra * speedPerCombo, maxSpeed);
+
+        // Size
+        ComboPopUp.transform.localScale = comboStartScale * Mathf.Min(1f + extra * sizePerCombo, maxSize);
+
+        // Colour: fixed per combo level; rainbow is handled in Update
+        if (comboAmount < rainbowFromCombo && !debugForceRainbow && comboColors.Length > 0)
+        {
+            ComboDisplay.color = comboColors[Mathf.Min(extra, comboColors.Length - 1)];
+        }
+    }
+
     /// <summary>
     ///  // in here we want to compare if the items given are the same as items wanted. 
     /// </summary>
@@ -223,10 +301,9 @@ public class DogFeeder : MonoBehaviour
 
             if (comboAmount >= 2)
             {
-                FindObjectOfType<SoundManagerScript>().Play("Ding");
+                UpdateComboLook();
 
-                // Add bonus to the hungerbar for achieving a combo
-                hungerLevel = Mathf.Min(hungerLevel + hungerGainPerMeal, 1f);
+                FindObjectOfType<SoundManagerScript>().Play("Ding");
             }
 
             comboTimer = 10f;
@@ -234,7 +311,7 @@ public class DogFeeder : MonoBehaviour
             // Score for this meal scales with the current combo tier and is sent immediately.
             if (NewScoreManager.Instance != null)
             {
-                NewScoreManager.Instance.AddScore(feedingBaseAward * comboAmount);
+                NewScoreManager.Instance.AddScore(feedingBaseAward * comboAmount, comboAmount >= 2);
             }
 
             // Flat coin reward per successful meal.
