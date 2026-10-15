@@ -56,6 +56,16 @@ public class DogFeeder : MonoBehaviour
     };
     public bool debugForceRainbow = false;               // debug: rainbow on for any combo of x2 or more
 
+    [Header("Combo Timer Bar")]
+    public GameObject comboBarRoot;                      // parent of the bar, shown only while a combo is active
+    public Image comboBarFill;                           // Image type = Filled
+    public Animator comboBarAnimator;                    // optional, sped up in the warning phase
+    public float comboWindow = 10f;                      // must match the value comboTimer is reset to
+    public float warningTime = 3f;                       // seconds left when the bar starts flashing
+    public Color warningColor = new Color32(0xED, 0x55, 0x65, 255); // grapefruit, same as the rainbow's red
+    public float warningFlashSpeed = 6f;                 // flashes per second
+    public float warningAnimSpeed = 2.5f;                // bar animator speed in the warning phase
+
     private Vector3 comboStartScale;
 
     // i also need to adjust how these look.
@@ -95,7 +105,7 @@ public class DogFeeder : MonoBehaviour
     /// </summary>
     void Start()
     {
-        comboTimer = 10f;
+        comboTimer = comboWindow;
         comboAmount = 0;
         comboStartScale = ComboPopUp.transform.localScale;
 
@@ -154,7 +164,7 @@ public class DogFeeder : MonoBehaviour
         {
             comboTimer -= Time.deltaTime;
 
-            if (comboTimer < 10f)
+            if (comboTimer < comboWindow)
             {
                 if (comboAmount >= 2)
                 {
@@ -166,18 +176,21 @@ public class DogFeeder : MonoBehaviour
                     {
                         ComboDisplay.color = GetRainbowColor(rainbowSpeed);
                     }
+
+                    UpdateComboBar();
                 }
             }
 
             if (comboTimer <= -comboGraceTime)
             {
                 ComboPopUp.SetActive(false);
+                HideComboBar();
 
                 FindObjectOfType<SoundManagerScript>().StopPlaying("Combo");
 
                 ComboStart = false;
 
-                comboTimer = 10f;
+                comboTimer = comboWindow;
                 comboAmount = 0;
             }
         }
@@ -244,6 +257,46 @@ public class DogFeeder : MonoBehaviour
         return comboColors[Mathf.Clamp(comboAmount - 2, 0, comboColors.Length - 1)];
     }
 
+    /// <summary>
+    /// Shows the bar, fills it by the time left in the combo window and tints it with the combo colour.
+    /// In the warning phase it flashes red and speeds up its animation.
+    /// </summary>
+    private void UpdateComboBar()
+    {
+        if (comboBarRoot == null || comboBarFill == null)
+        {
+            return;
+        }
+
+        comboBarRoot.SetActive(true);
+        comboBarFill.fillAmount = Mathf.Clamp01(comboTimer / comboWindow);
+
+        bool warning = comboTimer <= warningTime;
+        Color comboColor = GetCurrentComboColor();
+
+        comboBarFill.color = warning
+            ? Color.Lerp(comboColor, warningColor, Mathf.PingPong(Time.time * warningFlashSpeed, 1f))
+            : comboColor;
+
+        if (comboBarAnimator != null)
+        {
+            comboBarAnimator.speed = warning ? warningAnimSpeed : 1f;
+        }
+    }
+
+    private void HideComboBar()
+    {
+        if (comboBarAnimator != null)
+        {
+            comboBarAnimator.speed = 1f;
+        }
+
+        if (comboBarRoot != null)
+        {
+            comboBarRoot.SetActive(false);
+        }
+    }
+
     private Color GetRainbowColor(float cyclesPerSecond)
     {
         float position = Mathf.Repeat(Time.time * cyclesPerSecond, 1f) * rainbowColors.Length;
@@ -306,7 +359,7 @@ public class DogFeeder : MonoBehaviour
                 FindObjectOfType<SoundManagerScript>().Play("Ding");
             }
 
-            comboTimer = 10f;
+            comboTimer = comboWindow;
 
             // Score for this meal scales with the current combo tier and is sent immediately.
             if (NewScoreManager.Instance != null)

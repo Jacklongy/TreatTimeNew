@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 3065598189175120702}
   - component: {fileID: 2117489385484676219}
   m_Layer: 0
-  m_Name: RandomPowerUp
+  m_Name: Coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

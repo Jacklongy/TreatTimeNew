@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7216780291901671631, guid: b748947d7c99802498f77a583e43c502, type: 2}
+  - {fileID: 3052372974120093667, guid: a18d4d6f314eb444cb01ce90c1414566, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,7 +78,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -153073551
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1882285693962541324
@@ -103,8 +103,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: +1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b748947d7c99802498f77a583e43c502, type: 2}
-  m_sharedMaterial: {fileID: -7216780291901671631, guid: b748947d7c99802498f77a583e43c502, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a18d4d6f314eb444cb01ce90c1414566, type: 2}
+  m_sharedMaterial: {fileID: 3052372974120093667, guid: a18d4d6f314eb444cb01ce90c1414566, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -278,7 +278,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -153073551
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 4
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
