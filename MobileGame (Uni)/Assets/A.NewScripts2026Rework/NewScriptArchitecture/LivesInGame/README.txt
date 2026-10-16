@@ -19,7 +19,7 @@ END OF RUN
     - Runs once (runHasEnded guard).
     - Stores the score in NewRunManager, asks XPManager to convert score to XP (score x 0.1).
     - Pauses the game (Time.timeScale = 0) and shows the results screen.
-  GameOverScreenUiController.ShowResults  Just fills in the text: score, coins, XP, level before/after.
+  GameOverScreenUiController.ShowResults  Plays the results sequence (score, coin count-up, XP bar) on unscaled time. Tap skips to the end.
   XPManager         Does the XP math and level-ups. Keeps "at run start" values so the screen can show before/after.
                     Uses XPCurveConfig (SingletonAcrossScenes/XPCurve) for the XP needed per level.
 

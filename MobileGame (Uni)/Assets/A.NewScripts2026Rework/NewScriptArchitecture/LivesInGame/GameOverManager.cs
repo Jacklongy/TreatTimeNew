@@ -41,6 +41,9 @@ public class GameOverManager : MonoBehaviour
             return;
         }
 
+        // Must be read before SaveRun overwrites the stored high score.
+        bool isNewHighScore = IsNewHighScore(finalScore);
+
         runHasEnded = true;
         NewRunManager.Instance.CurrentRunScore = finalScore;
         xpManager.TakeScore(finalScore);
@@ -50,13 +53,28 @@ public class GameOverManager : MonoBehaviour
         if (gameOverScreen != null)
         {
             gameOverScreen.gameObject.SetActive(true);
-            gameOverScreen.ShowResults(
-                finalScore,
-                coinManager.CoinsEarnedThisRun,
-                xpManager.XPGainedThisRun,
-                xpManager.LevelAtRunStart,
-                xpManager.ProfileLevelAfterRun);
+            gameOverScreen.ShowResults(new GameOverResults
+            {
+                FinalScore = finalScore,
+                IsNewHighScore = isNewHighScore,
+                CoinsEarned = coinManager.CoinsEarnedThisRun,
+                StartingLevel = xpManager.LevelAtRunStart,
+                FinalLevel = xpManager.ProfileLevelAfterRun,
+                StartingXP = xpManager.XPAtRunStart,
+                FinalXP = xpManager.ProfileXPAfterRun,
+                XPSource = xpManager
+            });
         }
+    }
+
+    private bool IsNewHighScore(int finalScore)
+    {
+        if (PlayerProfileHolder.Instance == null)
+        {
+            return false;
+        }
+
+        return finalScore > PlayerProfileHolder.Instance.CurrentData.HighScoreTimed;
     }
 
     /// <summary>
