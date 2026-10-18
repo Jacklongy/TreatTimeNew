@@ -6,11 +6,14 @@ public class Tile : MonoBehaviour
 {
     public bool IsFull;
     public GameObject ObjectContainer;
-    [SerializeField] private SpaceOutline spaceOutline;
+    [SerializeField] private GameObject lockedVisual;
+    public bool IsLocked { get; private set; }
+    private SpaceOutline spaceOutline;
     private bool hasWarnedMissingOutline;
 
     private void Awake()
     {
+        SetLocked(false);
         EnsureSpaceOutline();
     }
 
@@ -23,6 +26,11 @@ public class Tile : MonoBehaviour
 
     public void TakeObject(GameObject Item)
     {
+        if (Item == null || IsLocked)
+        {
+            return;
+        }
+
         ObjectContainer = Item;
         ObjectContainer.transform.position = gameObject.transform.position;
         IsFull = true;
@@ -68,6 +76,18 @@ public class Tile : MonoBehaviour
         }
 
         IsFull = true;
+    }
+
+    /// <summary>
+    /// Sets whether this tile is available for gameplay and updates its assigned lock marker.
+    /// </summary>
+    public void SetLocked(bool locked)
+    {
+        IsLocked = locked;
+        if (lockedVisual != null && lockedVisual.activeSelf != locked)
+        {
+            lockedVisual.SetActive(locked);
+        }
     }
 
     public void ApplyOutline(bool top, bool bottom, bool left, bool right, Color color, int sortingOrder)

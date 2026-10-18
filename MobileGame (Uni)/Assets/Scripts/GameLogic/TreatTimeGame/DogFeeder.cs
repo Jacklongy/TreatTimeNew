@@ -80,9 +80,12 @@ public class DogFeeder : MonoBehaviour
     bool timerPause;
     public float hungerLevel = 0.5f; // Starts at 50% hunger
     public float hungerDecayRate = 0.25f; // How fast hunger depletes per second
+    [SerializeField, Min(0f)] private float hungerDecayIncreasePerMilestone = 0.02f;
     public float hungerGainPerMeal = 0.50f; // How much hunger increases per correct meal
     public float comboTimer;
     public float comboGraceTime = 0.3f; // extra time after the window ends, so late physics events still count
+    private float startingHungerDecayRate;
+    private bool subscribedToMilestones;
     [Header("Feeding Score")]
     [SerializeField, Min(1)] private int feedingBaseAward = 100;
     [SerializeField, Min(0)] private int coinsPerMeal = 5;
@@ -105,6 +108,9 @@ public class DogFeeder : MonoBehaviour
     /// </summary>
     void Start()
     {
+        hungerDecayRate = startingHungerDecayRate;
+        SubscribeToMilestones();
+
         comboTimer = comboWindow;
         comboAmount = 0;
         comboStartScale = ComboPopUp.transform.localScale;
@@ -117,6 +123,40 @@ public class DogFeeder : MonoBehaviour
         display.GetComponent<FoodCombo>().DisplayWantedFood(ChosenFood, ChosenBowl);
 
         RollNextCombo();
+    }
+
+    private void Awake()
+    {
+        startingHungerDecayRate = hungerDecayRate;
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToMilestones();
+    }
+
+    private void OnDisable()
+    {
+        if (subscribedToMilestones && NewScoreManager.Instance != null)
+        {
+            NewScoreManager.Instance.MilestoneReached -= HandleMilestoneReached;
+        }
+
+        subscribedToMilestones = false;
+    }
+
+    private void SubscribeToMilestones()
+    {
+        if (!subscribedToMilestones && NewScoreManager.Instance != null)
+        {
+            NewScoreManager.Instance.MilestoneReached += HandleMilestoneReached;
+            subscribedToMilestones = true;
+        }
+    }
+
+    private void HandleMilestoneReached(int milestoneScore)
+    {
+        hungerDecayRate += hungerDecayIncreasePerMilestone;
     }
 
     /// <summary>

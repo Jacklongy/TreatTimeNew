@@ -14,8 +14,12 @@ public class NewScoreManager : MonoBehaviour
 
     public int CurrentScore { get; private set; }
 
+    private static readonly int[] ScoreMilestones = { 1000, 5000, 10000, 20000 };
+    private int nextMilestoneIndex;
+
     // (amount added, whether it came from feeding the dog during a combo)
     public event System.Action<int, bool> ScoreAdded;
+    public event System.Action<int> MilestoneReached;
 
     private void Awake()
     {
@@ -45,6 +49,7 @@ public class NewScoreManager : MonoBehaviour
 
         CurrentScore += amount;
         RefreshScoreDisplay();
+        CheckForMilestones();
         ScoreAdded?.Invoke(amount, comboFeed);
     }
 
@@ -54,7 +59,20 @@ public class NewScoreManager : MonoBehaviour
     public void ResetRun()
     {
         CurrentScore = 0;
+        nextMilestoneIndex = 0;
         RefreshScoreDisplay();
+    }
+
+    private void CheckForMilestones()
+    {
+        while (nextMilestoneIndex < ScoreMilestones.Length && CurrentScore >= ScoreMilestones[nextMilestoneIndex])
+        {
+            int milestone = ScoreMilestones[nextMilestoneIndex];
+            nextMilestoneIndex++;
+
+            Debug.Log($"Score milestone reached: {milestone:N0}");
+            MilestoneReached?.Invoke(milestone);
+        }
     }
 
     private void RefreshScoreDisplay()

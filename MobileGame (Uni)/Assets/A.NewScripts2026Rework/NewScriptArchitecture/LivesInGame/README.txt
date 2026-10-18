@@ -11,6 +11,7 @@ START OF RUN
 
 DURING THE RUN
   NewScoreManager   Holds the run's score. Anything that scores calls AddScore(amount).
+                    At 1,000 / 5,000 / 10,000 / 20,000 points, raises a milestone event for grid unlocks and faster hunger drain.
   CoinManager       Holds coins earned this run. Anything that rewards coins calls AddCoins(amount).
   Neither one touches the saved profile.
 
@@ -19,7 +20,7 @@ END OF RUN
     - Runs once (runHasEnded guard).
     - Stores the score in NewRunManager, asks XPManager to convert score to XP (score x 0.1).
     - Pauses the game (Time.timeScale = 0) and shows the results screen.
-  GameOverScreenUiController.ShowResults  Plays the results sequence (score, coin count-up, XP bar) on unscaled time. Tap skips to the end.
+  GameOverScreenUiController.ShowResults  Plays the results sequence (score, coin count-up, XP bar) on unscaled time. Its animators use unscaled time too. Tap skips to the end.
   XPManager         Does the XP math and level-ups. Keeps "at run start" values so the screen can show before/after.
                     Uses XPCurveConfig (SingletonAcrossScenes/XPCurve) for the XP needed per level.
 

@@ -300,7 +300,7 @@ public class Grab : MonoBehaviour
 
             // Find the nearest tile to where we dropped
             Tile dropTile = gm != null ? gm.GetNearestTile(currentlyDragging.transform.position) : null;
-            GameObject itemOnTile = (dropTile != null && dropTile.IsFull) ? dropTile.ObjectContainer : null;
+            GameObject itemOnTile = (dropTile != null && !dropTile.IsLocked && dropTile.IsFull) ? dropTile.ObjectContainer : null;
 
             bool handled = false;
 
@@ -353,7 +353,7 @@ public class Grab : MonoBehaviour
 
             #region Tile Placement
             // Empty tile = place there
-            if (!handled && dropTile != null && !dropTile.IsFull)
+            if (!handled && dropTile != null && !dropTile.IsLocked && !dropTile.IsFull)
             {
                 dropTile.TakeObject(currentlyDragging);
                 currentlyDragging.layer = 7;
@@ -363,7 +363,7 @@ public class Grab : MonoBehaviour
             }
 
             // Occupied tile with non-mergeable item = swap
-            if (!handled && dropTile != null && dropTile.IsFull && itemOnTile != null)
+            if (!handled && dropTile != null && !dropTile.IsLocked && dropTile.IsFull && itemOnTile != null)
             {
                 // Remove other item from target tile
                 dropTile.RemoveObject();

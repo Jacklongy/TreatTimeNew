@@ -81,6 +81,9 @@ public class GameOverScreenUiController : MonoBehaviour
 
     private void Awake()
     {
+        SetAnimatorToUnscaledTime(scoreAnimator);
+        SetAnimatorToUnscaledTime(coinsAnimator);
+        SetAnimatorToUnscaledTime(xpAnimator);
         HideAll();
     }
 
@@ -339,6 +342,14 @@ public class GameOverScreenUiController : MonoBehaviour
         SetActive(coinsRoot, false);
         SetActive(xpRoot, false);
         SetButtonsInteractable(false);
+    }
+
+    private void SetAnimatorToUnscaledTime(Animator animator)
+    {
+        if (animator != null)
+        {
+            animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        }
     }
 
     private void SetButtonsInteractable(bool interactable)

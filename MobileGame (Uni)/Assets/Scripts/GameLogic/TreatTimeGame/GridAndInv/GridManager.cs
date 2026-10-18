@@ -16,8 +16,11 @@ public class GridManager : MonoBehaviour
     [SerializeField] private float gridStepY = 0.6868f;
     [SerializeField] private float neighborTolerance = 0.08f;
     [SerializeField] private float laneTolerance = 0.15f;
+    [SerializeField, Min(0)] private int initialLockedTileCount = 8;
+    [SerializeField, Min(0)] private int tilesUnlockedPerMilestone = 2;
 
     private readonly Dictionary<Tile, TileNeighborData> neighborByTile = new Dictionary<Tile, TileNeighborData>();
+    private bool subscribedToMilestones;
 
     private struct TileNeighborData
     {
@@ -37,6 +40,8 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
+        SubscribeToMilestones();
+
         // Auto-find all Tile components in children if not assigned
         if (allTiles == null || allTiles.Length == 0)
         {
@@ -44,6 +49,7 @@ public class GridManager : MonoBehaviour
             Debug.Log($"GridManager found {allTiles.Length} tiles");
         }
 
+        LockInitialTiles();
         BuildNeighborLookup();
 
         GroupOutlineController controller = GroupOutlineController.Instance != null
@@ -57,6 +63,102 @@ public class GridManager : MonoBehaviour
         }
 
         controller?.RequestRefresh();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToMilestones();
+    }
+
+    private void OnDisable()
+    {
+        if (subscribedToMilestones && NewScoreManager.Instance != null)
+        {
+            NewScoreManager.Instance.MilestoneReached -= HandleMilestoneReached;
+        }
+
+        subscribedToMilestones = false;
+    }
+
+    private void SubscribeToMilestones()
+    {
+        if (!subscribedToMilestones && NewScoreManager.Instance != null)
+        {
+            NewScoreManager.Instance.MilestoneReached += HandleMilestoneReached;
+            subscribedToMilestones = true;
+        }
+    }
+
+    private void LockInitialTiles()
+    {
+        List<Tile> availableTiles = new List<Tile>();
+
+        if (allTiles != null)
+        {
+            foreach (Tile tile in allTiles)
+            {
+                if (tile == null)
+                {
+                    continue;
+                }
+
+                tile.SetLocked(false);
+                tile.CheckIfFull();
+                if (!tile.IsFull)
+                {
+                    availableTiles.Add(tile);
+                }
+            }
+        }
+
+        int lockCount = Mathf.Min(initialLockedTileCount, availableTiles.Count);
+        for (int i = 0; i < lockCount; i++)
+        {
+            int randomIndex = Random.Range(0, availableTiles.Count);
+            availableTiles[randomIndex].SetLocked(true);
+            availableTiles.RemoveAt(randomIndex);
+        }
+
+        Debug.Log($"Locked {lockCount} tiles at run start.");
+    }
+
+    private void HandleMilestoneReached(int milestoneScore)
+    {
+        int unlockedCount = UnlockRandomTiles(tilesUnlockedPerMilestone);
+        Debug.Log($"Unlocked {unlockedCount} tiles for the {milestoneScore:N0} score milestone.");
+    }
+
+    private int UnlockRandomTiles(int count)
+    {
+        List<Tile> lockedTiles = new List<Tile>();
+        if (allTiles != null)
+        {
+            foreach (Tile tile in allTiles)
+            {
+                if (tile != null && tile.IsLocked)
+                {
+                    lockedTiles.Add(tile);
+                }
+            }
+        }
+
+        int unlockCount = Mathf.Min(count, lockedTiles.Count);
+        for (int i = 0; i < unlockCount; i++)
+        {
+            int randomIndex = Random.Range(0, lockedTiles.Count);
+            lockedTiles[randomIndex].SetLocked(false);
+            lockedTiles.RemoveAt(randomIndex);
+        }
+
+        if (unlockCount > 0)
+        {
+            GroupOutlineController controller = GroupOutlineController.Instance != null
+                ? GroupOutlineController.Instance
+                : FindObjectOfType<GroupOutlineController>();
+            controller?.RequestRefresh();
+        }
+
+        return unlockCount;
     }
 
     public void BuildNeighborLookup()
@@ -306,16 +408,7 @@ public class GridManager : MonoBehaviour
     /// <returns>Empty tile, or null if grid is full</returns>
     public Tile GetRandomEmptyTile()
     {
-        List<Tile> emptyTiles = new List<Tile>();
-
-        foreach (Tile tile in allTiles)
-        {
-            tile.CheckIfFull();
-            if (!tile.IsFull)
-            {
-                emptyTiles.Add(tile);
-            }
-        }
+        List<Tile> emptyTiles = GetAllEmptyTiles();
 
         if (emptyTiles.Count == 0)
         {
@@ -333,8 +426,18 @@ public class GridManager : MonoBehaviour
     {
         List<Tile> emptyTiles = new List<Tile>();
 
+        if (allTiles == null)
+        {
+            return emptyTiles;
+        }
+
         foreach (Tile tile in allTiles)
         {
+            if (tile == null || tile.IsLocked)
+            {
+                continue;
+            }
+
             tile.CheckIfFull();
             if (!tile.IsFull)
             {
@@ -354,6 +457,11 @@ public class GridManager : MonoBehaviour
 
         foreach (Tile tile in allTiles)
         {
+            if (tile == null)
+            {
+                continue;
+            }
+
             tile.CheckIfFull();
             if (tile.IsFull)
             {
@@ -369,14 +477,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public int GetEmptyTileCount()
     {
-        int count = 0;
-        foreach (Tile tile in allTiles)
-        {
-            tile.CheckIfFull();
-            if (!tile.IsFull)
-                count++;
-        }
-        return count;
+        return GetAllEmptyTiles().Count;
     }
 
     /// <summary>
@@ -384,13 +485,19 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public bool PlaceItemOnTile(GameObject item, Tile tile)
     {
-        if (tile == null)
+        if (item == null || tile == null)
         {
-            Debug.LogError("Cannot place item: Tile is null");
+            Debug.LogError("Cannot place item: Item or tile is null");
             return false;
         }
 
-        if (tile.IsFull)
+        if (tile.IsLocked)
+        {
+            Debug.LogWarning("Cannot place item: Tile is locked");
+            return false;
+        }
+
+        if (IsOccupied(tile))
         {
             Debug.LogWarning("Cannot place item: Tile is already full");
             return false;
@@ -457,6 +564,11 @@ public class GridManager : MonoBehaviour
 
         foreach (Tile tile in allTiles)
         {
+            if (tile == null)
+            {
+                continue;
+            }
+
             float distance = Vector3.Distance(position, tile.transform.position);
             if (distance < shortestDistance)
             {
