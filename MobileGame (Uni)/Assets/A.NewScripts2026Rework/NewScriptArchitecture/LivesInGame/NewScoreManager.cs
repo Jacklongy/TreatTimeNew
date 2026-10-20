@@ -14,7 +14,7 @@ public class NewScoreManager : MonoBehaviour
 
     public int CurrentScore { get; private set; }
 
-    private static readonly int[] ScoreMilestones = { 1000, 5000, 10000, 20000, 40000 };
+    private static readonly int[] ScoreMilestones = { 1000, 5000, 10000, 20000 };
     private int nextMilestoneIndex;
 
     // (amount added, whether it came from feeding the dog during a combo)

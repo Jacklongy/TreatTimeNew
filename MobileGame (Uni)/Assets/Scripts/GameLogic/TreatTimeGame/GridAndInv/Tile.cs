@@ -8,11 +8,18 @@ public class Tile : MonoBehaviour
     public GameObject ObjectContainer;
     [SerializeField] private GameObject lockedVisual;
     public bool IsLocked { get; private set; }
+    [SerializeField] private Animator tileAnimator;
+    private static readonly int LockedHash = Animator.StringToHash("Locked");
     private SpaceOutline spaceOutline;
     private bool hasWarnedMissingOutline;
 
     private void Awake()
     {
+        if (tileAnimator == null)
+        {
+            tileAnimator = GetComponent<Animator>();
+        }
+
         SetLocked(false);
         EnsureSpaceOutline();
     }
@@ -84,6 +91,11 @@ public class Tile : MonoBehaviour
     public void SetLocked(bool locked)
     {
         IsLocked = locked;
+        if (tileAnimator != null)
+        {
+            tileAnimator.SetBool(LockedHash, locked);
+        }
+
         if (lockedVisual != null && lockedVisual.activeSelf != locked)
         {
             lockedVisual.SetActive(locked);
