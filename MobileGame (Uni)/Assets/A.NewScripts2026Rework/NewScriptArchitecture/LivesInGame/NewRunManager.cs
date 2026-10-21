@@ -60,9 +60,18 @@ public class NewRunManager : MonoBehaviour
         var data = PlayerProfileHolder.Instance.CurrentData;
         data.HighScoreTimed = Mathf.Max(data.HighScoreTimed, CurrentRunScore);
 
+        if (coinManager == null)
+        {
+            coinManager = CoinManager.Instance;
+        }
+
         if (coinManager != null)
         {
             data.Coins += coinManager.CoinsEarnedThisRun;
+        }
+        else
+        {
+            Debug.LogError("NewRunManager has no CoinManager, so this run's coins were not saved.");
         }
 
         if (xpManager != null)

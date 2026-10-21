@@ -282,7 +282,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.4413767, y: 1.1176426, z: -0.37053835}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.42045, y: 0.42045, z: 0.8409}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4180367324436057854}
@@ -420,6 +420,7 @@ MonoBehaviour:
   shadowAnimator: {fileID: 2975542275477883526}
   grabbedScaleMultiplier: 1.15
   grabScaleDuration: 0.2
+  spawnFrontDuration: 0.25
   Panic: {fileID: 4507808293881270765}
   Splash: {fileID: 0}
   nextObject: {fileID: 8892973684014826733, guid: 6ecee3baefa58d44d914f6d1c1fa0cb9, type: 3}

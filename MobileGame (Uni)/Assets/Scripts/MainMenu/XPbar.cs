@@ -21,7 +21,7 @@ public class XPbar : MonoBehaviour
     {
         Rect uv = rawImage.uvRect;
         // Moving the UV window left makes the image appear to move right.
-        uv.x = Mathf.Repeat(uv.x - scrollSpeed * Time.deltaTime, 1f);
+        uv.x = Mathf.Repeat(uv.x - scrollSpeed * Time.unscaledDeltaTime, 1f);
         rawImage.uvRect = uv;
     }
 }

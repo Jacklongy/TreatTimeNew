@@ -80,7 +80,11 @@ public class DogFeeder : MonoBehaviour
     bool timerPause;
     public float hungerLevel = 0.5f; // Starts at 50% hunger
     public float hungerDecayRate = 0.25f; // How fast hunger depletes per second
-    [SerializeField, Min(0f)] private float hungerDecayIncreasePerMilestone = 0.02f;
+    [SerializeField, Min(0f)] private float hungerDecayIncreasePerMilestone = 0.01f;
+    [SerializeField, Min(1)] private int milestonesPerDecayIncrease = 2;
+    [Tooltip("Flat hunger added on top of the normal gain for every meal in a combo from the 2nd onwards.")]
+    [SerializeField, Range(0f, 1f)] private float comboHungerBonus = 0.25f;
+    private int milestonesReached;
     public float hungerGainPerMeal = 0.50f; // How much hunger increases per correct meal
     public float comboTimer;
     public float comboGraceTime = 0.3f; // extra time after the window ends, so late physics events still count
@@ -109,6 +113,7 @@ public class DogFeeder : MonoBehaviour
     void Start()
     {
         hungerDecayRate = startingHungerDecayRate;
+        milestonesReached = 0;
         SubscribeToMilestones();
 
         comboTimer = comboWindow;
@@ -156,7 +161,11 @@ public class DogFeeder : MonoBehaviour
 
     private void HandleMilestoneReached(int milestoneScore)
     {
-        hungerDecayRate += hungerDecayIncreasePerMilestone;
+        milestonesReached++;
+        if (milestonesReached % milestonesPerDecayIncrease == 0)
+        {
+            hungerDecayRate += hungerDecayIncreasePerMilestone;
+        }
     }
 
     /// <summary>
@@ -278,6 +287,12 @@ public class DogFeeder : MonoBehaviour
     }
 
     // Read by other scripts (e.g. ScoreTextCombo). Active uses the same rule as the popup.
+    // Raised after a correct meal, with the combo count including that meal.
+    public event System.Action<int> MealFed;
+
+    // Raised when the wrong food/bowl combo is served.
+    public event System.Action WrongMeal;
+
     public int ComboAmount => comboAmount;
     public bool ComboActive => ComboStart && comboAmount >= 2;
 
@@ -392,6 +407,11 @@ public class DogFeeder : MonoBehaviour
 
             comboAmount += 1;
 
+            // Feeding as part of a combo (2nd meal onwards) gives a bonus to hunger.
+            if (comboAmount >= 2)
+            {
+                hungerLevel = Mathf.Min(hungerLevel + comboHungerBonus, 1f);
+            }
             if (comboAmount >= 2)
             {
                 UpdateComboLook();
@@ -400,6 +420,8 @@ public class DogFeeder : MonoBehaviour
             }
 
             comboTimer = comboWindow;
+
+            MealFed?.Invoke(comboAmount);
 
             // Score for this meal scales with the current combo tier and is sent immediately.
             if (NewScoreManager.Instance != null)
@@ -426,6 +448,8 @@ public class DogFeeder : MonoBehaviour
 
             // Slight hunger decrease on wrong food (5% penalty)
             hungerLevel = Mathf.Max(hungerLevel - 0.05f, 0f);
+
+            WrongMeal?.Invoke();
 
             FindObjectOfType<SoundManagerScript>().Play("CantPlace");
             // play dog animation

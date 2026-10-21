@@ -53,7 +53,11 @@ public class GameOverScreenUiController : MonoBehaviour
     [SerializeField] private TMP_Text xpProgressText;
     [SerializeField] private Animator xpAnimator;
     [SerializeField] private string levelUpTrigger = "LevelUp";
-    [SerializeField] private float xpFullBarSeconds = 1.2f;
+    [SerializeField] private float xpFullBarSeconds = 2.5f;
+    [Tooltip("Minimum time any fill segment takes, so small XP gains don't zip up.")]
+    [SerializeField] private float xpMinFillSeconds = 1.2f;
+    [Tooltip("Pause after the XP bar appears before it starts filling.")]
+    [SerializeField] private float xpRevealPauseSeconds = 0.75f;
     [SerializeField] private float levelUpAnimationSeconds = 0.8f;
     [SerializeField] private int maxAnimatedLevelUps = 5;
 
@@ -176,6 +180,7 @@ public class GameOverScreenUiController : MonoBehaviour
         int level = results.StartingLevel;
         float fill = GetFillForXP(level, results.StartingXP);
         SetXPDisplay(level, fill);
+        yield return WaitUnscaled(xpRevealPauseSeconds);
 
         int levelUpsAnimated = 0;
 
@@ -203,13 +208,21 @@ public class GameOverScreenUiController : MonoBehaviour
 
     private IEnumerator AnimateFill(int level, float from, float to)
     {
-        float duration = Mathf.Max(0.05f, Mathf.Abs(to - from) * xpFullBarSeconds);
+        if (Mathf.Approximately(from, to))
+        {
+            SetXPDisplay(level, to);
+            yield break;
+        }
+
+        float duration = Mathf.Max(xpMinFillSeconds, Mathf.Abs(to - from) * xpFullBarSeconds);
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
-            SetXPDisplay(level, Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration)));
+            float t = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - (1f - t) * (1f - t);
+            SetXPDisplay(level, Mathf.Lerp(from, to, eased));
             yield return null;
         }
 

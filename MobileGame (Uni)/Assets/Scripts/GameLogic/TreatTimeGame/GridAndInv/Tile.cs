@@ -10,6 +10,13 @@ public class Tile : MonoBehaviour
     public bool IsLocked { get; private set; }
     [SerializeField] private Animator tileAnimator;
     private static readonly int LockedHash = Animator.StringToHash("Locked");
+    private static readonly int UnlockedHash = Animator.StringToHash("Unlocked");
+    [Header("Debug")]
+    [Tooltip("Tick in play mode to fire the unlock animation on this tile. Resets itself.")]
+    [SerializeField] private bool debugPlayUnlockAnimation;
+    [Tooltip("Seconds the locked visual stays visible after unlocking so the unlock animation can be seen.")]
+    [SerializeField, Min(0f)] private float unlockVisualHideDelay = 2f;
+    private Coroutine hideVisualRoutine;
     private SpaceOutline spaceOutline;
     private bool hasWarnedMissingOutline;
 
@@ -22,6 +29,19 @@ public class Tile : MonoBehaviour
 
         SetLocked(false);
         EnsureSpaceOutline();
+    }
+
+    private void Update()
+    {
+        if (debugPlayUnlockAnimation)
+        {
+            debugPlayUnlockAnimation = false;
+            if (tileAnimator != null)
+            {
+                tileAnimator.SetBool(LockedHash, false);
+                tileAnimator.SetTrigger(UnlockedHash);
+            }
+        }
     }
 
     // Start is called before the first frame update
@@ -90,16 +110,44 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void SetLocked(bool locked)
     {
+        bool wasLocked = IsLocked;
         IsLocked = locked;
         if (tileAnimator != null)
         {
             tileAnimator.SetBool(LockedHash, locked);
+            // Only fire on a real locked -> unlocked transition, not the initial Awake setup.
+            if (wasLocked && !locked)
+            {
+                tileAnimator.SetTrigger(UnlockedHash);
+            }
         }
 
-        if (lockedVisual != null && lockedVisual.activeSelf != locked)
+        if (hideVisualRoutine != null)
         {
-            lockedVisual.SetActive(locked);
+            StopCoroutine(hideVisualRoutine);
+            hideVisualRoutine = null;
         }
+
+        if (lockedVisual == null || lockedVisual.activeSelf == locked)
+        {
+            return;
+        }
+
+        // Keep the lock visible while the unlock animation plays, otherwise it is hidden instantly.
+        if (wasLocked && !locked && unlockVisualHideDelay > 0f && isActiveAndEnabled)
+        {
+            hideVisualRoutine = StartCoroutine(HideLockedVisualAfterDelay());
+            return;
+        }
+
+        lockedVisual.SetActive(locked);
+    }
+
+    private IEnumerator HideLockedVisualAfterDelay()
+    {
+        yield return new WaitForSeconds(unlockVisualHideDelay);
+        lockedVisual.SetActive(false);
+        hideVisualRoutine = null;
     }
 
     public void ApplyOutline(bool top, bool bottom, bool left, bool right, Color color, int sortingOrder)

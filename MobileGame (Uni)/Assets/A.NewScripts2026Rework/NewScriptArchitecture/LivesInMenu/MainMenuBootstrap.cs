@@ -14,6 +14,7 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
 // E.g if the boot(game) has data, Strap the boot. Lol. I could re name this to like DataCheckAndLoad or something.
 {
     [SerializeField] private MainMenuXPDisplay xpDisplay;
+    [SerializeField] private MainMenuCoinDisplay coinDisplay;
 
     [SerializeField] private TextMeshProUGUI PlayerNameText;
     [SerializeField] private TextMeshProUGUI DogNameText;
@@ -39,6 +40,7 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
         }
 
         xpDisplay?.Refresh();
+        coinDisplay?.Refresh();
 
         if (PlayerNameText != null)
         {
