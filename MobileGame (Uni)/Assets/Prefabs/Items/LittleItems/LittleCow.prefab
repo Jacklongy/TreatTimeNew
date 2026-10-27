@@ -161,7 +161,7 @@ MonoBehaviour:
   scoreLevel: 1
   OnGrid: 0
   mySlot: {fileID: 0}
-  particlesDrop: {fileID: 2022007913487994508, guid: 1b8d814f32c1abc44adfbf1a3a96a91e, type: 3}
+  particlesDrop: {fileID: 2022007913487994508, guid: a16aa59e785c3fe49855e801b2ba7758, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 1031225659137853801}

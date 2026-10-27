@@ -12,6 +12,12 @@ using UnityEngine;
 /// </summary>
 public abstract class Item : MonoBehaviour
 {
+
+
+    [Header("Display Settings")]
+
+    public bool IsADisplayItem;
+
     [Header("Score Settings")]
     [SerializeField, Range(1, 4)] private int scoreLevel = 1;
 
@@ -25,6 +31,7 @@ public abstract class Item : MonoBehaviour
 
     [Header("Grab Visuals")]
     public Animator shadowAnimator;
+    public Animator itemAnimator;
     [Range(1f, 2f)] public float grabbedScaleMultiplier = 1.15f;
     [Range(0.05f, 0.5f)] public float grabScaleDuration = 0.2f;
     [Range(0.05f, 1f)] public float spawnFrontDuration = 0.25f;
@@ -33,14 +40,30 @@ public abstract class Item : MonoBehaviour
 
     private void Awake()
     {
-        sound = FindObjectOfType<SoundManagerScript>();
+
         originalLocalScale = transform.localScale;
-        if (shadowAnimator != null)
+
+        // Display items skip the spawn animation and sorting layer changes
+        if (IsADisplayItem)
         {
-            shadowAnimator = shadowAnimator.GetComponent<Animator>();
+            return;
         }
 
+        sound = FindObjectOfType<SoundManagerScript>();
         StartCoroutine(SpawnInFront());
+    }
+
+    // Disabling/enabling an object resets its Animator parameters, so reapply every time
+    private void OnEnable()
+    {
+        if (itemAnimator != null)
+        {
+            itemAnimator.SetBool("IsDisplay", IsADisplayItem);
+        }
+        if (shadowAnimator != null)
+        {
+            shadowAnimator.SetBool("IsDisplay", IsADisplayItem);
+        }
     }
 
     private IEnumerator SpawnInFront()

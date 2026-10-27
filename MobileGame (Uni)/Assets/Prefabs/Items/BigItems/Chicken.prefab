@@ -133,11 +133,11 @@ Transform:
   m_GameObject: {fileID: 668109391370633924}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.22699, y: -0.33238852, z: 0}
-  m_LocalScale: {x: 1.4339458, y: 1.4339458, z: 1.4339458}
+  m_LocalPosition: {x: 0.15829702, y: -0.33082747, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8764274612829809812}
+  m_Father: {fileID: 5253403823267590936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6529738263284292143
 SpriteRenderer:
@@ -353,8 +353,6 @@ Transform:
   m_Children:
   - {fileID: 3477567723647058445}
   - {fileID: 5253403823267590936}
-  - {fileID: 4743798340560477774}
-  - {fileID: 713202460825037229}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2612786376162241684
@@ -481,7 +479,7 @@ MonoBehaviour:
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
-  particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
+  particlesDrop: {fileID: 2022007913487994508, guid: 4701599fd93793640a893339decb455d, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 926075993845069321}
@@ -524,7 +522,7 @@ Transform:
   m_GameObject: {fileID: 4071289435561731132}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.009, y: -0.4262875, z: 0}
+  m_LocalPosition: {x: -0.009, y: -0.4262875, z: 0.32}
   m_LocalScale: {x: 1.0494914, y: 0.14661144, z: 2.4432487}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -638,6 +636,8 @@ Transform:
   - {fileID: 8030925198349332546}
   - {fileID: 864709902889896578}
   - {fileID: 8110298354452101716}
+  - {fileID: 4743798340560477774}
+  - {fileID: 713202460825037229}
   m_Father: {fileID: 8764274612829809812}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &292285823306377150
@@ -740,11 +740,11 @@ Transform:
   m_GameObject: {fileID: 5815265090886278972}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.26774, y: -0.3107985, z: 0}
-  m_LocalScale: {x: 1.4339458, y: 1.4339458, z: 1.4339458}
+  m_LocalPosition: {x: -0.186716, y: -0.31577098, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8764274612829809812}
+  m_Father: {fileID: 5253403823267590936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5608094803947842171
 SpriteRenderer:

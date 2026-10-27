@@ -12,6 +12,8 @@ public class Sound
     public string name; 
 
     public AudioClip clip;
+    // Optional extra clips; one is picked at random (along with the main clip) each play.
+    public AudioClip[] variations;
     [Range(0f, 1f)]
     public float volume;
     [Range(.1f, 3f)]
@@ -21,4 +23,7 @@ public class Sound
 
     [HideInInspector]
     public AudioSource source;
+
+    [HideInInspector]
+    public int lastIndex = -1;
 }

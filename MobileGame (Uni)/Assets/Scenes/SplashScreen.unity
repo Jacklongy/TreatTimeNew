@@ -2448,6 +2448,144 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1091899199}
   m_CullTransparentMesh: 1
+--- !u!1 &1094526063
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1094526065}
+  - component: {fileID: 1094526064}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1094526064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094526063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ce4ab545842a54bb0d428cb0c1b81f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Place
+    clip: {fileID: 8300000, guid: 77264365b5d0b3f4fa34e9a67a3b5732, type: 3}
+    variations: []
+    volume: 0.4
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: Treat Time Music
+    clip: {fileID: 8300000, guid: 72c7060e5b7e5ea4291436ef31c43e44, type: 3}
+    variations: []
+    volume: 0.037
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: ChickenPickUp
+    clip: {fileID: 8300000, guid: 4b9628bef37bc2a4f842116472fa3102, type: 3}
+    variations:
+    - {fileID: 8300000, guid: bf25f2c7405438340a7ce2481c428fe7, type: 3}
+    - {fileID: 8300000, guid: b2b469456ebee9a4aad0b0f9df0736a2, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: LobbyMusic
+    clip: {fileID: 8300000, guid: acadfa1972c46d54fa777c581e7eec88, type: 3}
+    variations: []
+    volume: 0.085
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: Ding
+    clip: {fileID: 8300000, guid: 6bfa4f07c9c2df24da738d2d3b69a55b, type: 3}
+    variations: []
+    volume: 0.085
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: Grabbed
+    clip: {fileID: 8300000, guid: 65ba63329b2b9ef48a0aa9a31adf69e5, type: 3}
+    variations: []
+    volume: 1
+    pitch: 3
+    loop: 0
+    source: {fileID: 0}
+  - name: Merge
+    clip: {fileID: 8300000, guid: 99be774f54665d94fab7c8f499f5dbcf, type: 3}
+    variations: []
+    volume: 0.543
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: Dog
+    clip: {fileID: 8300000, guid: 8c03e23492ed0a849a020a5dff780e6d, type: 3}
+    variations: []
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: PlaceInBowl
+    clip: {fileID: 8300000, guid: 950ce4ab7d6ed4145b96fe7d57e221ae, type: 3}
+    variations: []
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: CantPlace
+    clip: {fileID: 8300000, guid: 2a528cf4156ce56469c5fb99ba08c5a8, type: 3}
+    variations: []
+    volume: 0.196
+    pitch: 0.98
+    loop: 0
+    source: {fileID: 0}
+  - name: Shuffle
+    clip: {fileID: 8300000, guid: 5f574f05ca569d34d83de451d04ce4a4, type: 3}
+    variations: []
+    volume: 0.5
+    pitch: 0.98
+    loop: 0
+    source: {fileID: 0}
+  - name: down
+    clip: {fileID: 8300000, guid: f0cace82ae0f34249bd012523fdd705d, type: 3}
+    variations: []
+    volume: 1
+    pitch: 0.98
+    loop: 0
+    source: {fileID: 0}
+  - name: Combo
+    clip: {fileID: 8300000, guid: 6d5c650b661d70a4fa9f229efc208503, type: 3}
+    variations: []
+    volume: 0.113
+    pitch: 0.98
+    loop: 0
+    source: {fileID: 0}
+--- !u!4 &1094526065
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094526063}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.5698652, y: 0.27550888, z: -0.9080986}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1168489506
 GameObject:
   m_ObjectHideFlags: 0
@@ -4255,6 +4393,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1595752154}
+  - {fileID: 1094526065}
   - {fileID: 951381152}
   - {fileID: 837308331}
   - {fileID: 609745496}

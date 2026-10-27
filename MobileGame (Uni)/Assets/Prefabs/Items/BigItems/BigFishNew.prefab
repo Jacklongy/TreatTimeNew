@@ -559,7 +559,7 @@ Transform:
   m_GameObject: {fileID: 7679894362706996920}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.027343204, y: -0.2959328, z: 0.32}
+  m_LocalPosition: {x: -0.027343204, y: -0.2959328, z: -0.19}
   m_LocalScale: {x: 0.9161857, y: 0.1279857, z: 1.49304}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -883,7 +883,7 @@ MonoBehaviour:
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
-  particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
+  particlesDrop: {fileID: 6868058373404902451, guid: ca6c8fa06d8e3f245a5b5d3378e2c3ab, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 7229809894793117567}

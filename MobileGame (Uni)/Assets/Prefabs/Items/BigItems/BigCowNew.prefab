@@ -415,6 +415,7 @@ Transform:
   - {fileID: 6346663628149939080}
   - {fileID: 5373582018472674150}
   - {fileID: 2264023604937388548}
+  - {fileID: 3212131400369070019}
   m_Father: {fileID: 7734868632418573701}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1282394116205122714
@@ -517,11 +518,11 @@ Transform:
   m_GameObject: {fileID: 3733937355080936465}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.095070906, y: -0.41755503, z: 0.409105}
-  m_LocalScale: {x: 1.5871671, y: 1.5871671, z: 1.1371344}
+  m_LocalPosition: {x: -0.058098156, y: -0.25516385, z: 0.4}
+  m_LocalScale: {x: 0.969902, y: 0.969902, z: 1.1118264}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7734868632418573701}
+  m_Father: {fileID: 6216889270262595031}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5615731272364126686
 SpriteRenderer:
@@ -631,7 +632,6 @@ Transform:
   m_Children:
   - {fileID: 2493712213271107013}
   - {fileID: 6216889270262595031}
-  - {fileID: 3212131400369070019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6017271604691181453
@@ -758,7 +758,7 @@ MonoBehaviour:
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
-  particlesDrop: {fileID: 2022007913487994508, guid: f55f09f5f20e0124ba41554b1060e48f, type: 3}
+  particlesDrop: {fileID: 2022007913487994508, guid: a16aa59e785c3fe49855e801b2ba7758, type: 3}
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 6656862636899477240}

@@ -27,6 +27,10 @@ public class Chicken : Item
     {
         base.Grabbed();
 
+
+        // Pick up sound
+        FindObjectOfType<SoundManagerScript>().Play("ChickenPickUp");
+
         #region Start Animation
         Leftflap.SetBool("Grabbed", true);
         Rightflap.SetBool("Grabbed", true);
@@ -46,7 +50,9 @@ public class Chicken : Item
     public override void Dropped()
     {
         base.Dropped();
-        FindObjectOfType<SoundManagerScript>().StopPlaying("ChickenFlap");
+       
+        // stop playing the sound on drop
+        //FindObjectOfType<SoundManagerScript>().StopPlaying("ChickenPickUp");
     }
 
     public override void Merge(GameObject mergeMe)
@@ -58,9 +64,9 @@ public class Chicken : Item
             Debug.Log("i merged");
             Instantiate(Cooked, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, -0.5f), Quaternion.identity);
 
-            FindObjectOfType<SoundManagerScript>().StopPlaying("ChickenFlap");
 
-            // play somesort of animation
+            // stop playing the pick up sound
+            FindObjectOfType<SoundManagerScript>().StopPlaying("ChickenPickUp");
 
             Destroy(gameObject);
             // grid location, spawn chicken. 

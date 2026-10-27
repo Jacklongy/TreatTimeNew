@@ -55,12 +55,25 @@ public class SoundManagerScript : MonoBehaviour
             return;
         }
 
+        if (s.variations != null && s.variations.Length > 0)
+        {
+            int count = s.variations.Length + 1;
+            int i = UnityEngine.Random.Range(0, count);
+
+            // Skip the last played clip by shifting to the next one.
+            if (i == s.lastIndex)
+                i = (i + 1) % count;
+
+            s.lastIndex = i;
+            s.source.clip = i == 0 ? s.clip : s.variations[i - 1];
+        }
+
         s.source.Play();
     }
 
 
     /// <summary>
-    /// Stop playing to control sounds that are looping. 
+    /// Stop playing to control sounds that are looping.
     /// </summary>
     /// <param name="name"> name of sound. </param>
     public void StopPlaying(string name)
