@@ -8,8 +8,17 @@ public class MainMenuCoinDisplay : MonoBehaviour
 {
     [SerializeField] private TMP_Text coinsText;
 
+    private void OnEnable()
+    {
+        ShopManager.OnCurrencyChanged += Refresh;
+    }
+
+    private void OnDisable()
+    {
+        ShopManager.OnCurrencyChanged -= Refresh;
+    }
+
     /// <summary>
-    /// Reads the current profile and updates the coin display.
     /// Call this after PlayerProfileHolder has loaded/reset the profile.
     /// </summary>
     public void Refresh()

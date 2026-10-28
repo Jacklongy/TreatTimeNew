@@ -1,4 +1,15 @@
 using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// Which hat is worn by which target. SlotId is "dog" or the id of an individual game item.
+/// </summary>
+[Serializable]
+public struct EquippedSlot
+{
+    public string SlotId;
+    public string ItemId;
+}
 
 /// <summary>
 /// Serializable local player data. It contains values only; managers and save services own the behavior.
@@ -29,8 +40,14 @@ public class PlayerProfileData
 
     public bool HasUnsyncedChanges => SaveRevision > SyncedRevision;
 
+    // Shop state. Items are referenced by ShopItemData.Id.
+    public List<string> PurchasedItemIds;
+    public List<EquippedSlot> EquippedSlots;
+
     public PlayerProfileData()
     {
+        PurchasedItemIds = new List<string>();
+        EquippedSlots = new List<EquippedSlot>();
         playername = "";
         DogName = "Default";
         Coins = 0;

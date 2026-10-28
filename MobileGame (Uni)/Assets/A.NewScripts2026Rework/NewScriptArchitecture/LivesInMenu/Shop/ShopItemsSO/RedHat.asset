@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d159c4b7d49157f49b8f98baa82d1603, type: 3}
+  m_Name: RedHat
+  m_EditorClassIdentifier: 
+  id: RedHat
+  displayName: Red Hat
+  icon: {fileID: 7482667652216324306, guid: 0dd1514421c4e034299c3edc203d5c70, type: 3}
+  category: 1
+  rarity: 0
+  currency: 0
+  price: 10
+  requiredLevel: 1
+  hatPrefab: {fileID: 3141978608223575193, guid: 8bae9b097bb96ff42b8b5d1fa6836190, type: 3}

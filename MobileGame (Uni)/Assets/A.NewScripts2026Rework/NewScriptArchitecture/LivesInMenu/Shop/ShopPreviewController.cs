@@ -13,6 +13,10 @@ public class ShopPreviewController : MonoBehaviour
 
     public GameObject currentPreviewItem;
 
+    /// <summary>The HatSlot on the previewed object, if it has one.</summary>
+    public HatSlot CurrentHatSlot =>
+        currentPreviewItem != null ? currentPreviewItem.GetComponentInChildren<HatSlot>(true) : null;
+
     [SerializeField]
     private PreviewItemEntry[] previewItemArray;
 
