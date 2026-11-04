@@ -17,22 +17,46 @@ public enum PurchaseResult { Success, NothingSelected, Locked, AlreadyOwned, Not
 
 public class ShopManager : MonoBehaviour
 {
+    [SerializeField] private ShopCatalog catalog;
     [SerializeField] private Wardrobe wardrobe;
     [SerializeField] private ShopPreviewController previewController;
 
     public static event Action OnCurrencyChanged;
     public event Action<ShopItemData> OnSelectionChanged;
+    public event Action<string> OnTargetChanged;
     public event Action<ShopItemData, PurchaseResult> OnPurchaseAttempted;
 
     public ShopItemData SelectedItem { get; private set; }
-    public string SelectedSlotId { get; private set; }
+
+    /// <summary>The slot id of whatever is currently shown in the preview (egg, chicken, dog...).</summary>
+    public string SelectedSlotId
+    {
+        get
+        {
+            HatSlot slot = previewController != null ? previewController.CurrentHatSlot : null;
+            return slot != null ? slot.SlotId : null;
+        }
+    }
 
     /// <summary>Called by the side list buttons: chooses which item (egg, chicken, dog) is being dressed.</summary>
     public void SelectTarget(string slotId)
     {
-        SelectedSlotId = slotId;
+        // Put the old target back to its saved hat so a stale preview isn't left on it.
+        HatSlot previous = previewController.CurrentHatSlot;
+        if (previous != null) previous.ShowSavedHat();
+
         previewController.PreviewItem(slotId);
         ShowPreviewHat(SelectedItem);
+        OnTargetChanged?.Invoke(SelectedSlotId);
+    }
+
+    /// <summary>Drops the hat being previewed and puts the target back to what it really wears.</summary>
+    public void ClearPreview()
+    {
+        SelectedItem = null;
+        HatSlot slot = previewController != null ? previewController.CurrentHatSlot : null;
+        if (slot != null) slot.ShowSavedHat();
+        OnSelectionChanged?.Invoke(null);
     }
 
     /// <summary>Called by a shop slot: shows the hat on the current target without saving.</summary>
@@ -48,22 +72,28 @@ public class ShopManager : MonoBehaviour
         if (PlayerInventory.IsOwned(item)) return ShopItemState.Owned;
 
         PlayerProfileData data = PlayerProfileHolder.Instance != null ? PlayerProfileHolder.Instance.CurrentData : null;
-        if (data != null && data.CurrentLevel < item.RequiredLevel) return ShopItemState.Locked;
+        if (data != null && data.CurrentLevel < GetRequiredLevel(item)) return ShopItemState.Locked;
 
         return ShopItemState.Available;
     }
 
-    /// <summary>Button hook: buys the selected hat and equips it on the selected target.</summary>
-    public void BuySelected()
+    public int GetRequiredLevel(ShopItemData item)
+    {
+        return catalog != null ? catalog.GetRequiredLevel(item) : 0;
+    }
+
+    /// <summary>Buys the selected hat and equips it on the selected target. Returns the result so the slot can animate.</summary>
+    public PurchaseResult TryBuySelected()
     {
         PurchaseResult result = TryPurchase(SelectedItem);
         OnPurchaseAttempted?.Invoke(SelectedItem, result);
+        return result;
     }
 
-    /// <summary>Button hook: equips an already owned selected hat on the selected target.</summary>
-    public void EquipSelected()
+    /// <summary>Equips an already owned selected hat on the selected target.</summary>
+    public bool TryEquipSelected()
     {
-        wardrobe.TryEquip(SelectedSlotId, SelectedItem);
+        return wardrobe.TryEquip(SelectedSlotId, SelectedItem);
     }
 
     public PurchaseResult TryPurchase(ShopItemData item)

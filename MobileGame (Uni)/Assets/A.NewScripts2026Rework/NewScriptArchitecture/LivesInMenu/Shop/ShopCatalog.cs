@@ -13,7 +13,17 @@ public class ShopCatalog : ScriptableObject
     [Header("Items")]
     [SerializeField] private List<ShopItemData> itemHats = new List<ShopItemData>();
 
+    [Header("Unlock levels")]
+    [Tooltip("Player level needed to buy each rarity, in enum order: Common, Rare, Epic, Legendary.")]
+    [SerializeField] private int[] requiredLevelByRarity = { 0, 20, 40, 60 };
+
     private Dictionary<string, ShopItemData> lookup;
+
+    public int GetRequiredLevel(ShopItemData item)
+    {
+        int index = (int)item.Rarity;
+        return index >= 0 && index < requiredLevelByRarity.Length ? requiredLevelByRarity[index] : 0;
+    }
 
     public IReadOnlyList<ShopItemData> DogHats => dogHats;
     public IReadOnlyList<ShopItemData> ItemHats => itemHats;

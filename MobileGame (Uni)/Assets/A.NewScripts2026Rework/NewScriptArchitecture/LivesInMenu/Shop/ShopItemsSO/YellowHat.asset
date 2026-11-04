@@ -16,8 +16,7 @@ MonoBehaviour:
   displayName: Yellow Hat
   icon: {fileID: -2413806693520163455, guid: b0e64d5406c170e4ea3a909300cac49c, type: 3}
   category: 1
-  rarity: 0
+  rarity: 3
   currency: 0
   price: 1
-  requiredLevel: 1
   hatPrefab: {fileID: 3141978608223575193, guid: 0818f519a3a8ab443aaddadb1b5bb38d, type: 3}

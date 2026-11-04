@@ -18,6 +18,5 @@ MonoBehaviour:
   category: 1
   rarity: 0
   currency: 0
-  price: 10
-  requiredLevel: 1
+  price: 1
   hatPrefab: {fileID: 3141978608223575193, guid: 8bae9b097bb96ff42b8b5d1fa6836190, type: 3}

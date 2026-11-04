@@ -18,8 +18,6 @@ public class ShopItemData : ScriptableObject
     [SerializeField] private ItemRarity rarity;
     [SerializeField] private CurrencyType currency;
     [Min(0)] [SerializeField] private int price;
-    [Tooltip("Player level needed before this can be bought.")]
-    [Min(0)] [SerializeField] private int requiredLevel;
 
     [Header("Visuals")]
     [Tooltip("Prefab with a sprite, spawned under an item's hat anchor when equipped.")]
@@ -32,7 +30,6 @@ public class ShopItemData : ScriptableObject
     public ItemRarity Rarity => rarity;
     public CurrencyType Currency => currency;
     public int Price => price;
-    public int RequiredLevel => requiredLevel;
     public GameObject HatPrefab => hatPrefab;
 
 #if UNITY_EDITOR

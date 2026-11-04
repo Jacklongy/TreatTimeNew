@@ -2485,6 +2485,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Treat Time Music
     clip: {fileID: 8300000, guid: 72c7060e5b7e5ea4291436ef31c43e44, type: 3}
     variations: []
@@ -2492,6 +2493,7 @@ MonoBehaviour:
     pitch: 1
     loop: 1
     source: {fileID: 0}
+    lastIndex: -1
   - name: ChickenPickUp
     clip: {fileID: 8300000, guid: 4b9628bef37bc2a4f842116472fa3102, type: 3}
     variations:
@@ -2501,6 +2503,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: LobbyMusic
     clip: {fileID: 8300000, guid: acadfa1972c46d54fa777c581e7eec88, type: 3}
     variations: []
@@ -2508,6 +2511,7 @@ MonoBehaviour:
     pitch: 1
     loop: 1
     source: {fileID: 0}
+    lastIndex: -1
   - name: Ding
     clip: {fileID: 8300000, guid: 6bfa4f07c9c2df24da738d2d3b69a55b, type: 3}
     variations: []
@@ -2515,6 +2519,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Grabbed
     clip: {fileID: 8300000, guid: 65ba63329b2b9ef48a0aa9a31adf69e5, type: 3}
     variations: []
@@ -2522,6 +2527,7 @@ MonoBehaviour:
     pitch: 3
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Merge
     clip: {fileID: 8300000, guid: 99be774f54665d94fab7c8f499f5dbcf, type: 3}
     variations: []
@@ -2529,6 +2535,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Dog
     clip: {fileID: 8300000, guid: 8c03e23492ed0a849a020a5dff780e6d, type: 3}
     variations: []
@@ -2536,6 +2543,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: PlaceInBowl
     clip: {fileID: 8300000, guid: 950ce4ab7d6ed4145b96fe7d57e221ae, type: 3}
     variations: []
@@ -2543,6 +2551,7 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: CantPlace
     clip: {fileID: 8300000, guid: 2a528cf4156ce56469c5fb99ba08c5a8, type: 3}
     variations: []
@@ -2550,6 +2559,7 @@ MonoBehaviour:
     pitch: 0.98
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Shuffle
     clip: {fileID: 8300000, guid: 5f574f05ca569d34d83de451d04ce4a4, type: 3}
     variations: []
@@ -2557,6 +2567,7 @@ MonoBehaviour:
     pitch: 0.98
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: down
     clip: {fileID: 8300000, guid: f0cace82ae0f34249bd012523fdd705d, type: 3}
     variations: []
@@ -2564,6 +2575,7 @@ MonoBehaviour:
     pitch: 0.98
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
   - name: Combo
     clip: {fileID: 8300000, guid: 6d5c650b661d70a4fa9f229efc208503, type: 3}
     variations: []
@@ -2571,6 +2583,7 @@ MonoBehaviour:
     pitch: 0.98
     loop: 0
     source: {fileID: 0}
+    lastIndex: -1
 --- !u!4 &1094526065
 Transform:
   m_ObjectHideFlags: 0
@@ -4110,6 +4123,8 @@ MonoBehaviour:
     VibrationsEnabled: 1
     SaveRevision: 0
     SyncedRevision: 0
+    PurchasedItemIds: []
+    EquippedSlots: []
 --- !u!4 &1903792973
 Transform:
   m_ObjectHideFlags: 0
