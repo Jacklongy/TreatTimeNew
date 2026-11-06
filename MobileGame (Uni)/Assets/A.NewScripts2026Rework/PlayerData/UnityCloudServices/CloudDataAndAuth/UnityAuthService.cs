@@ -35,7 +35,13 @@ public class UnityAuthService : MonoBehaviour
     /// </summary>
     public Task SignInAsync()
     {
-        return signInTask ??= SignInInternalAsync();
+        if (signInTask == null || signInTask.IsFaulted || signInTask.IsCanceled ||
+            (signInTask.IsCompleted && !AuthenticationService.Instance.IsSignedIn))
+        {
+            signInTask = SignInInternalAsync();
+        }
+
+        return signInTask;
     }
 
     /// <summary>Non-throwing SignInAsync. Returns true when the player ends up signed in.</summary>
@@ -96,14 +102,12 @@ public class UnityAuthService : MonoBehaviour
             else
             {
                 Debug.Log("Player is already signed in.");
-                await EnsureTokenIsAvailable();
             }
         }
         catch (Exception e)
         {
             Debug.LogError("Initialization or sign-in failed:");
             Debug.LogException(e);
-            signInTask = null; // allow a retry
             throw;
         }
     }
@@ -148,8 +152,6 @@ public class UnityAuthService : MonoBehaviour
         AuthenticationService.Instance.SignedIn += () =>
         {
             Debug.Log("Player successfully signed in.");
-            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
-            EnsureTokenIsAvailable().Wait();
         };
 
         AuthenticationService.Instance.SignInFailed += (err) =>
@@ -167,27 +169,6 @@ public class UnityAuthService : MonoBehaviour
             Debug.LogWarning("Player session expired. Reauthenticating...");
             ReauthenticateAsync();
         };
-    }
-
-    private async Task EnsureTokenIsAvailable()
-    {
-        int attempts = 0;
-        const int maxAttempts = 5;
-
-        while (attempts < maxAttempts)
-        {
-            if (!string.IsNullOrEmpty(AuthenticationService.Instance.AccessToken))
-            {
-                Debug.Log($"Access Token: {AuthenticationService.Instance.AccessToken}");
-                return;
-            }
-
-            attempts++;
-            Debug.LogWarning($"Access token missing. Attempt {attempts}/{maxAttempts}. Retrying...");
-            await Task.Delay(500);
-        }
-
-        Debug.LogError("Access token is still missing after multiple attempts.");
     }
 
     private async void ReauthenticateAsync()
@@ -213,9 +194,6 @@ public class UnityAuthService : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
             Debug.Log("Anonymous sign-in succeeded!");
-            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
-
-            await EnsureTokenIsAvailable();
         }
         catch (AuthenticationException ex)
         {
@@ -230,8 +208,6 @@ public class UnityAuthService : MonoBehaviour
             throw;
         }
 
-        Debug.Log($"IsSignedIn: {AuthenticationService.Instance.IsSignedIn}");
-        Debug.Log($"Access Token: {AuthenticationService.Instance.AccessToken}");
     }
 
     private void OnDestroy()

@@ -1298,8 +1298,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 118.49
-  m_fontSizeBase: 118.49
+  m_fontSize: 46.7
+  m_fontSizeBase: 46.7
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1427,11 +1427,11 @@ MonoBehaviour:
   guestButton: {fileID: 482586174}
   appleSignInButton: {fileID: 1068813089}
   googleSignInButton: {fileID: 268192984}
-  nameEntryPanel: {fileID: 0}
-  playerNameInput: {fileID: 0}
-  dogNameInput: {fileID: 0}
-  confirmButton: {fileID: 0}
-  statusText: {fileID: 0}
+  nameEntryPanel: {fileID: 1723968250}
+  playerNameInput: {fileID: 532511007}
+  dogNameInput: {fileID: 1604727121}
+  confirmButton: {fileID: 765741123}
+  statusText: {fileID: 1690728222}
 --- !u!4 &609745496
 Transform:
   m_ObjectHideFlags: 0
@@ -3845,7 +3845,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: test
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a18d4d6f314eb444cb01ce90c1414566, type: 2}
   m_sharedMaterial: {fileID: 3052372974120093667, guid: a18d4d6f314eb444cb01ce90c1414566, type: 2}
@@ -3872,8 +3872,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 19.6
+  m_fontSizeBase: 19.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

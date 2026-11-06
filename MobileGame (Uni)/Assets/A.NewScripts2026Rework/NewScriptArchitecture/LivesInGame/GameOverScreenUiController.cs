@@ -19,7 +19,7 @@ public struct GameOverResults
 }
 
 /// <summary>
-/// Plays the game over results as a sequence: score, then coins counting up, then the XP bar filling.
+/// Plays the game over results as a sequence: score, coins, XP, then the exit button.
 /// Runs on unscaled time because the game is paused (timeScale 0) while this screen is open.
 /// A tap anywhere skips straight to the final state.
 /// </summary>
@@ -61,8 +61,8 @@ public class GameOverScreenUiController : MonoBehaviour
     [SerializeField] private float levelUpAnimationSeconds = 0.8f;
     [SerializeField] private int maxAnimatedLevelUps = 5;
 
-    [Header("Buttons")]
-    [SerializeField] private CanvasGroup buttonsGroup;
+    [Header("Exit Button")]
+    [SerializeField] private GameObject exitButton;
 
 
     [Header("Other UI Elements")]
@@ -233,7 +233,7 @@ public class GameOverScreenUiController : MonoBehaviour
     {
         sequenceRunning = false;
         sequenceRoutine = null;
-        SetButtonsInteractable(true);
+        SetActive(exitButton, true);
     }
 
     private void SkipToFinalState()
@@ -354,7 +354,7 @@ public class GameOverScreenUiController : MonoBehaviour
         SetActive(scoreRoot, false);
         SetActive(coinsRoot, false);
         SetActive(xpRoot, false);
-        SetButtonsInteractable(false);
+        SetActive(exitButton, false);
     }
 
     private void SetAnimatorToUnscaledTime(Animator animator)
@@ -362,14 +362,6 @@ public class GameOverScreenUiController : MonoBehaviour
         if (animator != null)
         {
             animator.updateMode = AnimatorUpdateMode.UnscaledTime;
-        }
-    }
-
-    private void SetButtonsInteractable(bool interactable)
-    {
-        if (buttonsGroup != null)
-        {
-            buttonsGroup.interactable = interactable;
         }
     }
 

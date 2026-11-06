@@ -125,8 +125,8 @@ public class SignUpScreenController : MonoBehaviour
     /// Finishes guest sign-up:
     ///   1. Validate the names.
     ///   2. Write them into the profile.
-    ///   3. If online, set the Unity account name.
-    ///   4. Save locally, then upload if online (offline profiles upload on a later launch).
+    ///   3. Save locally, then reconcile with the cloud when available.
+    ///   4. If signed in, update the Unity account name without blocking navigation.
     ///   5. Raise GuestSetupCompleted.
     /// </summary>
     private async void OnConfirmPressed()
@@ -148,12 +148,19 @@ public class SignUpScreenController : MonoBehaviour
             PlayerProfileHolder.Instance.CurrentData.playername = playerName;
             PlayerProfileHolder.Instance.CurrentData.DogName = dogName;
 
-            if (await ProfileSyncService.TryGoOnlineAsync())
+            if (LocalSaveStorage.Instance == null || !LocalSaveStorage.Instance.Save())
             {
-                await UnityAuthService.Instance.SetPlayerNameAsync(playerName);
+                throw new InvalidOperationException("Could not save the new player profile locally.");
             }
 
-            await ProfileSyncService.SaveAndSyncAsync();
+            if (!ProfileSyncService.CloudSyncDisabledForSession)
+            {
+                await ProfileSyncService.SyncAsync();
+                if (CloudSaveStorage.instance != null && CloudSaveStorage.instance.IsReady)
+                {
+                    _ = UnityAuthService.Instance.SetPlayerNameAsync(PlayerProfileHolder.Instance.CurrentData.playername);
+                }
+            }
 
             GuestSetupCompleted?.Invoke();
         }

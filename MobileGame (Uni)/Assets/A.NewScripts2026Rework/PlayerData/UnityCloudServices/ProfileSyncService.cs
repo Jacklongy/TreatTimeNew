@@ -15,8 +15,19 @@ using UnityEngine;
 public static class ProfileSyncService
 {
     private const string CloudKey = "PlayerProfile";
+    private const int ConnectionTimeoutMilliseconds = 15000;
 
     private static bool isSyncing;
+    private static bool cloudReconciled;
+
+    public static bool CloudSyncDisabledForSession { get; private set; }
+
+    /// <summary>Starts a new sync session. A debug reset must not read or overwrite the cloud backup.</summary>
+    public static void BeginSession(bool disableCloudSync)
+    {
+        CloudSyncDisabledForSession = disableCloudSync;
+        cloudReconciled = false;
+    }
 
     private enum SyncAction
     {
@@ -41,7 +52,14 @@ public static class ProfileSyncService
             return false;
         }
 
-        return await UnityAuthService.Instance.TrySignInAsync() && CloudSaveStorage.instance.IsReady;
+        Task<bool> signIn = UnityAuthService.Instance.TrySignInAsync();
+        if (await Task.WhenAny(signIn, Task.Delay(ConnectionTimeoutMilliseconds)) != signIn)
+        {
+            Debug.LogWarning("[Sync] Sign-in timed out. Continuing with local data.");
+            return false;
+        }
+
+        return await signIn && CloudSaveStorage.instance.IsReady;
     }
 
     #endregion
@@ -54,6 +72,11 @@ public static class ProfileSyncService
     /// </summary>
     public static Task<bool> SyncAsync()
     {
+        if (CloudSyncDisabledForSession)
+        {
+            return Task.FromResult(false);
+        }
+
         return RunExclusiveAsync(RunSyncAsync);
     }
 
@@ -83,15 +106,21 @@ public static class ProfileSyncService
         switch (action)
         {
             case SyncAction.Pull:
-                ApplyCloudProfile(cloud);
-                return true;
+                if (!ApplyCloudProfile(cloud))
+                    return false;
+                break;
 
             case SyncAction.Push:
-                return await PushCurrentAsync();
+                if (!await PushCurrentAsync())
+                    return false;
+                break;
 
             default:
-                return true;
+                break;
         }
+
+        cloudReconciled = true;
+        return true;
     }
 
     /// <summary>
@@ -158,11 +187,14 @@ public static class ProfileSyncService
     }
 
     /// <summary>Replaces the live profile with the cloud one and saves it to the device as already synced.</summary>
-    private static void ApplyCloudProfile(PlayerProfileData cloud)
+    private static bool ApplyCloudProfile(PlayerProfileData cloud)
     {
         cloud.SyncedRevision = cloud.SaveRevision;
+        if (!LocalSaveStorage.Instance.Save(cloud, false))
+            return false;
+
         PlayerProfileHolder.Instance.SetData(cloud);
-        LocalSaveStorage.Instance.Save(cloud, false);
+        return true;
     }
 
     #endregion
@@ -170,9 +202,9 @@ public static class ProfileSyncService
     #region Saving
 
     /// <summary>
-    /// Saves locally (always), then uploads to the cloud if a connection is available.
-    /// If the upload fails the profile stays flagged as unsynced and uploads on a later save or startup.
-    /// Returns true only if the cloud upload succeeded.
+    /// Saves locally first, then reconciles or uploads when cloud sync is available.
+    /// If cloud sync fails, the profile remains pending for a later save or startup.
+    /// Returns true only if local and cloud were successfully reconciled.
     /// </summary>
     public static async Task<bool> SaveAndSyncAsync()
     {
@@ -180,6 +212,17 @@ public static class ProfileSyncService
         if (LocalSaveStorage.Instance == null || !LocalSaveStorage.Instance.Save())
         {
             return false;
+        }
+
+        if (CloudSyncDisabledForSession)
+        {
+            return false;
+        }
+
+        // Never overwrite an unread cloud profile after an offline or failed startup.
+        if (!cloudReconciled)
+        {
+            return await SyncAsync();
         }
 
         // Step 2: skip the upload if we're offline.
@@ -210,8 +253,7 @@ public static class ProfileSyncService
         // and only advance to the revision we actually uploaded.
         PlayerProfileData current = PlayerProfileHolder.Instance.CurrentData;
         current.SyncedRevision = Mathf.Max(current.SyncedRevision, pushedRevision);
-        LocalSaveStorage.Instance.Save(current, false);
-        return true;
+        return LocalSaveStorage.Instance.Save(current, false);
     }
 
     #endregion
@@ -226,6 +268,7 @@ public static class ProfileSyncService
     {
         if (isSyncing)
         {
+            Debug.LogWarning("[Sync] Another cloud operation is in progress; local changes remain pending.");
             return false;
         }
 
@@ -249,9 +292,15 @@ public static class ProfileSyncService
         {
             data = JsonUtility.FromJson<PlayerProfileData>(json);
         }
-        catch (ArgumentException)
+        catch (ArgumentException exception)
         {
+            Debug.LogWarning($"[Sync] Could not parse cloud profile: {exception.Message}");
             return false;
+        }
+
+        if (data == null)
+        {
+            Debug.LogWarning("[Sync] Cloud profile was empty or invalid.");
         }
 
         return data != null;

@@ -14,7 +14,6 @@ public class BowlButton : MonoBehaviour
     
     [Header("References")]
     private GridManager gridManager;
-    private SoundManagerScript soundManager;
     
     public Image ProgressRing;
 
@@ -30,7 +29,6 @@ public class BowlButton : MonoBehaviour
     private void Start()
     {
         gridManager = FindObjectOfType<GridManager>();
-        soundManager = FindObjectOfType<SoundManagerScript>();
         pressesRemaining = ButtonPresses;
 
         // Ring starts full (ready to use)
@@ -79,12 +77,6 @@ public class BowlButton : MonoBehaviour
 
         // Spawn the bowl
         SpawnBowlOnTile(randomBowlPrefab, emptyTile);
-
-        // Play sound
-        if (soundManager != null)
-        {
-            soundManager.Play("BowlSpawn");
-        }
 
         Debug.Log($"Spawned {randomBowlPrefab.name} on grid");
 
@@ -142,6 +134,11 @@ public class BowlButton : MonoBehaviour
         if (itemComponent != null)
         {
             itemComponent.ResetAnim();
+            itemComponent.Dropped();
+        }
+        else
+        {
+            Debug.LogError($"Spawned bowl {spawnedBowl.name} has no Item component.", spawnedBowl);
         }
     }
 }

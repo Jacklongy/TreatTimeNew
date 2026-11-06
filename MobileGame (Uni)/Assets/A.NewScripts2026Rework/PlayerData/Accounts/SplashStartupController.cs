@@ -21,6 +21,7 @@ using UnityEngine.UI;
 public class SplashStartupController : MonoBehaviour
 {
     [Header("Debug")]
+    [Tooltip("In editor and development builds, delete the local profile and disable cloud sync for this session. The cloud backup is not deleted.")]
     public bool resetDataThisSession;
 
     [Tooltip("Pretends there is no internet so the offline flow can be tested. Only works in the editor and development builds.")]
@@ -92,6 +93,12 @@ public class SplashStartupController : MonoBehaviour
         // Step 3: local profile.
         LoadLocalProfile();
 
+        if (ProfileSyncService.CloudSyncDisabledForSession)
+        {
+            RouteAfterSignIn();
+            return;
+        }
+
         // Step 4: try to go online.
         ShowStatus("Connecting...");
         isOnline = await ProfileSyncService.TryGoOnlineAsync();
@@ -122,23 +129,39 @@ public class SplashStartupController : MonoBehaviour
 
     private void ApplyDebugReset()
     {
-        if (!resetDataThisSession)
+        ProfileSyncService.BeginSession(resetDataThisSession && Debug.isDebugBuild);
+
+        if (!resetDataThisSession || !Debug.isDebugBuild)
         {
             return;
         }
 
-        LocalSaveStorage.Instance.DeleteSave();
+        if (LocalSaveStorage.Instance == null || !LocalSaveStorage.Instance.DeleteSave())
+        {
+            throw new InvalidOperationException("Could not reset the local player profile.");
+        }
+
         PlayerProfileHolder.Instance.ResetData();
+        Debug.LogWarning("[Splash] Local profile reset. Cloud sync is disabled for this session; the cloud backup is unchanged.");
     }
 
     /// <summary>Loads player_data.json into PlayerProfileHolder, or starts from default data if there is no file.</summary>
     private void LoadLocalProfile()
     {
-        bool loaded = LocalSaveStorage.Instance != null && LocalSaveStorage.Instance.Load();
+        if (LocalSaveStorage.Instance == null)
+        {
+            throw new InvalidOperationException("LocalSaveStorage is missing.");
+        }
 
-        if (!loaded)
+        if (!LocalSaveStorage.Instance.HasSaveData())
         {
             PlayerProfileHolder.Instance.ResetData();
+            return;
+        }
+
+        if (!LocalSaveStorage.Instance.Load())
+        {
+            throw new InvalidOperationException("The existing local player profile could not be loaded.");
         }
     }
 
@@ -146,13 +169,16 @@ public class SplashStartupController : MonoBehaviour
     private async Task SyncWithCloudAsync()
     {
         ShowStatus("Syncing...");
-        await ProfileSyncService.SyncAsync();
+        if (!await ProfileSyncService.SyncAsync())
+        {
+            Debug.LogWarning("[Splash] Cloud sync did not complete. Continuing with the local profile.");
+        }
 
         // The name may have been created offline, or just pulled from the cloud.
         string playerName = PlayerProfileHolder.Instance.CurrentData.playername;
-        if (!string.IsNullOrWhiteSpace(playerName))
+        if (!ProfileSyncService.CloudSyncDisabledForSession && !string.IsNullOrWhiteSpace(playerName))
         {
-            await UnityAuthService.Instance.SetPlayerNameAsync(playerName);
+            _ = UnityAuthService.Instance.SetPlayerNameAsync(playerName);
         }
     }
 
@@ -249,6 +275,11 @@ public class SplashStartupController : MonoBehaviour
         if (SceneController.Instance != null)
         {
             SceneController.Instance.LoadScene(menuSceneName);
+        }
+        else
+        {
+            Debug.LogError("[Splash] Cannot open the menu because SceneController is missing.");
+            ShowStatus("Unable to load the menu. Please restart the game.");
         }
     }
 
