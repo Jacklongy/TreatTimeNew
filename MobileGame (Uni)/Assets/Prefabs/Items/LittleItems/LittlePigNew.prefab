@@ -35,6 +35,7 @@ Transform:
   m_Children:
   - {fileID: 4428656436569776498}
   - {fileID: 5404073724282198239}
+  - {fileID: 7696920337840059592}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3243557988358148792
@@ -158,6 +159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba77c3aba7afe54d81f9fcdd1797b05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsADisplayItem: 0
   scoreLevel: 1
   OnGrid: 0
   mySlot: {fileID: 0}
@@ -165,6 +167,7 @@ MonoBehaviour:
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 2278133339756419587}
+  itemAnimator: {fileID: 0}
   grabbedScaleMultiplier: 1.15
   grabScaleDuration: 0.2
   spawnFrontDuration: 0.25
@@ -281,6 +284,53 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &2729008698200245391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7696920337840059592}
+  - component: {fileID: 3997379991618169008}
+  m_Layer: 10
+  m_Name: HatLocation (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7696920337840059592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2729008698200245391}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.06, y: 0.55, z: 8.824784}
+  m_LocalScale: {x: 0.9852676, y: 0.9852676, z: 0.9852548}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 167191830375652287}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3997379991618169008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2729008698200245391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ab212966b0a5e4caca390f8f51e0b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotId: pig
+  hatAnchor: {fileID: 7696920337840059592}
+  catalog: {fileID: 11400000, guid: a7e8a3c7c9c15934f93f4daebe415915, type: 2}
 --- !u!1 &3725863700444140369
 GameObject:
   m_ObjectHideFlags: 0

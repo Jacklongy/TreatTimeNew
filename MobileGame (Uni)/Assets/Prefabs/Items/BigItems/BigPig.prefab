@@ -106,6 +106,53 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &1008213998705426762
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3123476559754863178}
+  - component: {fileID: 4199566774660247080}
+  m_Layer: 10
+  m_Name: HatLocation (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3123476559754863178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008213998705426762}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.059480228, y: 0.52094585, z: 8.74882}
+  m_LocalScale: {x: 0.854346, y: 0.854346, z: 0.854335}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1168192698845642451}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4199566774660247080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008213998705426762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ab212966b0a5e4caca390f8f51e0b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotId: bigPig
+  hatAnchor: {fileID: 3123476559754863178}
+  catalog: {fileID: 11400000, guid: a7e8a3c7c9c15934f93f4daebe415915, type: 2}
 --- !u!1 &1912774732883763454
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,11 +571,12 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.5}
-  m_LocalScale: {x: 0.4559277, y: 0.4559277, z: 0.9118554}
+  m_LocalScale: {x: 0.35787103, y: 0.35787103, z: 0.71574205}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5512042296353219691}
   - {fileID: 3336449787797250491}
+  - {fileID: 3123476559754863178}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5832707636002062136
@@ -652,6 +700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bfa48733c176e148abd3b58dc4fca65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsADisplayItem: 0
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
@@ -659,6 +708,7 @@ MonoBehaviour:
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 4896111899815768956}
+  itemAnimator: {fileID: 0}
   grabbedScaleMultiplier: 1.15
   grabScaleDuration: 0.2
   spawnFrontDuration: 0.25

@@ -1,5 +1,52 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &352093451089580632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4709743003330814822}
+  - component: {fileID: 8863689589690472146}
+  m_Layer: 10
+  m_Name: HatLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4709743003330814822
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352093451089580632}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.261, y: 0.145, z: 7.535845}
+  m_LocalScale: {x: 0.67595196, y: 0.67595196, z: 0.9463205}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 45211950056298512}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8863689589690472146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352093451089580632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ab212966b0a5e4caca390f8f51e0b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotId: bigFish
+  hatAnchor: {fileID: 4709743003330814822}
+  catalog: {fileID: 11400000, guid: a7e8a3c7c9c15934f93f4daebe415915, type: 2}
 --- !u!1 &448261846992650175
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,11 +799,12 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.256, y: 0.792, z: -0.42866}
-  m_LocalScale: {x: 0.576254, y: 0.576254, z: 0.82322}
+  m_LocalScale: {x: 0.45231867, y: 0.45231867, z: 0.64616954}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8332262328360055038}
   - {fileID: 935289988876505969}
+  - {fileID: 4709743003330814822}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4933161315446163163
@@ -880,6 +928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daa4ab02ce0bc0e4eae8f81c70b16b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsADisplayItem: 0
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
@@ -887,6 +936,7 @@ MonoBehaviour:
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 7229809894793117567}
+  itemAnimator: {fileID: 0}
   grabbedScaleMultiplier: 1.15
   grabScaleDuration: 0.2
   spawnFrontDuration: 0.25

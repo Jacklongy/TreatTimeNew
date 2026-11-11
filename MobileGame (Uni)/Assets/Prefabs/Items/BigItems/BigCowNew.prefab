@@ -627,11 +627,12 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.572156, y: 0.5527889, z: -0.5}
-  m_LocalScale: {x: 0.45592767, y: 0.45592767, z: 0.91185534}
+  m_LocalScale: {x: 0.357871, y: 0.357871, z: 0.715742}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2493712213271107013}
   - {fileID: 6216889270262595031}
+  - {fileID: 6718476542828594682}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6017271604691181453
@@ -755,6 +756,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a4376c2c5cb9c4a873636a09f5ca8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsADisplayItem: 1
   scoreLevel: 2
   OnGrid: 0
   mySlot: {fileID: 0}
@@ -762,6 +764,7 @@ MonoBehaviour:
   particlesMerge: {fileID: 2182905743496358767, guid: 27011d3cf67ede34893ef0061a251461, type: 3}
   droppedSound: 
   shadowAnimator: {fileID: 6656862636899477240}
+  itemAnimator: {fileID: 0}
   grabbedScaleMultiplier: 1.15
   grabScaleDuration: 0.2
   spawnFrontDuration: 0.25
@@ -771,6 +774,53 @@ MonoBehaviour:
   Panic: {fileID: 2219641906609068102}
   Cooked: {fileID: 991399599403527306, guid: 593f954f20e672849805c35dda25a385, type: 3}
   gridTag: FoodArea
+--- !u!1 &5239110056611110507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6718476542828594682}
+  - component: {fileID: 4014011773207263979}
+  m_Layer: 10
+  m_Name: HatLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6718476542828594682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5239110056611110507}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.081870176, y: 0.48583537, z: 3.4330666}
+  m_LocalScale: {x: 0.8543461, y: 0.8543461, z: 0.8543351}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7734868632418573701}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4014011773207263979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5239110056611110507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ab212966b0a5e4caca390f8f51e0b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotId: bigCow
+  hatAnchor: {fileID: 6718476542828594682}
+  catalog: {fileID: 11400000, guid: a7e8a3c7c9c15934f93f4daebe415915, type: 2}
 --- !u!1 &6271212328606946157
 GameObject:
   m_ObjectHideFlags: 0
