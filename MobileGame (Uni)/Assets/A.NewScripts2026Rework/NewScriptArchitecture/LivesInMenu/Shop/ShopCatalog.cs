@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// The list of every shop item. Resolves saved ids back to ShopItemData assets.
@@ -7,11 +8,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ShopCatalog", menuName = "Shop/Shop Catalog")]
 public class ShopCatalog : ScriptableObject
 {
-    [Header("Dog")]
+    [HideInInspector]
     [SerializeField] private List<ShopItemData> dogHats = new List<ShopItemData>();
 
-    [Header("Items")]
-    [SerializeField] private List<ShopItemData> itemHats = new List<ShopItemData>();
+    [Header("Shared hats")]
+    [FormerlySerializedAs("itemHats")]
+    [SerializeField] private List<ShopItemData> hats = new List<ShopItemData>();
 
     [Header("Unlock levels")]
     [Tooltip("Player level needed to buy each rarity, in enum order: Common, Rare, Epic, Legendary.")]
@@ -25,8 +27,14 @@ public class ShopCatalog : ScriptableObject
         return index >= 0 && index < requiredLevelByRarity.Length ? requiredLevelByRarity[index] : 0;
     }
 
-    public IReadOnlyList<ShopItemData> DogHats => dogHats;
-    public IReadOnlyList<ShopItemData> ItemHats => itemHats;
+    public IEnumerable<ShopItemData> Hats
+    {
+        get
+        {
+            foreach (ShopItemData hat in hats) yield return hat;
+            foreach (ShopItemData hat in dogHats) yield return hat;
+        }
+    }
 
     public ShopItemData GetById(string id)
     {
@@ -37,28 +45,12 @@ public class ShopCatalog : ScriptableObject
         return item;
     }
 
-    public IReadOnlyList<ShopItemData> GetByCategory(ItemCategory category)
-    {
-        return category == ItemCategory.DogHat ? dogHats : itemHats;
-    }
-
     private void BuildLookup()
     {
         lookup = new Dictionary<string, ShopItemData>();
-        AddToLookup(dogHats, ItemCategory.DogHat);
-        AddToLookup(itemHats, ItemCategory.ItemHat);
-    }
-
-    private void AddToLookup(List<ShopItemData> list, ItemCategory expected)
-    {
-        foreach (ShopItemData item in list)
+        foreach (ShopItemData item in Hats)
         {
             if (item == null) continue;
-
-            if (item.Category != expected)
-            {
-                Debug.LogWarning($"Shop item '{item.name}' is in the {expected} list but its category is {item.Category}.", item);
-            }
 
             if (string.IsNullOrEmpty(item.Id) || !lookup.TryAdd(item.Id, item))
             {

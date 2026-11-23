@@ -1,155 +1,212 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Advertisements;
+using System;
 using System.Collections;
+using Unity.Services.LevelPlay;
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
-public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
+/// <summary>Loads LevelPlay rewarded ads and saves the meal refill on a reward callback.</summary>
+public class RewardedAdsButton : MonoBehaviour
 {
-    [SerializeField] Button _showAdButton;
-    [SerializeField] string _androidAdUnitId = "Rewarded_Android";
-    //[SerializeField] string _iOSAdUnitId = "Rewarded_iOS";
-    string _adUnitId = null; // This will remain null for unsupported platforms
+    [SerializeField] private Ads ads;
+    [SerializeField] private string androidAdUnitId;
+    [SerializeField] private string iosAdUnitId;
+    [SerializeField] private string placementName;
+    [SerializeField, Min(0)] private int maxRetries = 3;
+    [SerializeField, Min(1)] private float retryDelay = 5f;
+    [FormerlySerializedAs("_showAdButton")]
+    [SerializeField, HideInInspector] private Button legacyButton;
 
-    [SerializeField] private int maxRetries = 3;
-    [SerializeField] private float retryDelay = 2f;
-    private int currentRetryCount = 0;
+    private LevelPlayRewardedAd rewardedAd;
+    private bool loading;
+    private bool isShowing;
+    private bool pendingReward;
+    private bool requestedAd;
+    private bool rewardGrantedForRequest;
+    private int retryCount;
+    private float nextRewardRetry;
+    private Coroutine retryRoutine;
 
-    void Awake()
+    public bool IsShowing => isShowing;
+    public bool HasPendingReward => pendingReward;
+    public bool IsReady => rewardedAd != null && !loading && !isShowing && !pendingReward &&
+        rewardedAd.IsAdReady() && !LevelPlayRewardedAd.IsPlacementCapped(placementName);
+    public event Action StateChanged;
+
+    private void Awake()
     {
-        // Get the Ad Unit ID for the current platform:
-#if UNITY_IOS
-        _adUnitId = _iOSAdUnitId;
-#elif UNITY_ANDROID
-        _adUnitId = _androidAdUnitId;
-#elif UNITY_EDITOR
-        _adUnitId = _androidAdUnitId; // Use Android ID for testing in Editor
-#endif
-
-        // Disable the button until the ad is ready to show:
-        _showAdButton.interactable = false;
+        // Old scene buttons must not promise a reward that has not been configured.
+        if (legacyButton != null) legacyButton.interactable = false;
     }
 
-    // Call this public method when you want to get an ad ready to show.
-    public void LoadAd()
+    private void Start()
     {
-        // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
-        if (string.IsNullOrEmpty(_adUnitId))
+        if (ads != null && Ads.Instance != null && ads != Ads.Instance)
         {
-            Debug.LogWarning("Ad Unit ID not set for this platform. Ads not available.");
+            enabled = false;
             return;
         }
 
-        currentRetryCount = 0;
-        Debug.Log("Loading Ad: " + _adUnitId);
-        Advertisement.Load(_adUnitId, this);
-    }
-
-    // If the ad successfully loads, add a listener to the button and enable it:
-    public void OnUnityAdsAdLoaded(string adUnitId)
-    {
-        Debug.Log("Ad Loaded: " + adUnitId);
-
-        if (adUnitId.Equals(_adUnitId))
+        if (ads == null || ads != Ads.Instance || ads.gameObject != gameObject)
         {
-            // Configure the button to call the ShowAd() method when clicked:
-            _showAdButton.onClick.AddListener(ShowAd);
-            // Enable the button for users to click:
-            _showAdButton.interactable = true;
-            currentRetryCount = 0; // Reset retry count on success
+            Debug.LogError("[LevelPlay] Assign the Ads component on this same persistent root object.", this);
+            return;
         }
+
+        ads.Initialized += OnInitialized;
+        if (ads.IsReady) OnInitialized();
     }
 
-    // Implement a method to execute when the user clicks the button:
+    private void OnInitialized()
+    {
+        if (rewardedAd != null) return;
+#if UNITY_IOS && !UNITY_EDITOR
+        string adUnitId = iosAdUnitId;
+#else
+        string adUnitId = androidAdUnitId;
+#endif
+        if (string.IsNullOrWhiteSpace(adUnitId) || string.IsNullOrWhiteSpace(placementName))
+        {
+            Debug.LogError("[LevelPlay] Set the rewarded Ad Unit ID and meal placement name.", this);
+            return;
+        }
+
+        rewardedAd = new LevelPlayRewardedAd(adUnitId);
+        rewardedAd.OnAdLoaded += OnAdLoaded;
+        rewardedAd.OnAdLoadFailed += OnAdLoadFailed;
+        rewardedAd.OnAdDisplayFailed += OnAdDisplayFailed;
+        rewardedAd.OnAdClosed += OnAdClosed;
+        rewardedAd.OnAdRewarded += OnAdRewarded;
+        LoadAd();
+    }
+
+    public void LoadAd()
+    {
+        if (rewardedAd == null || loading || isShowing || pendingReward || retryRoutine != null ||
+            rewardedAd.IsAdReady()) return;
+        retryCount = 0;
+        RequestAd();
+    }
+
+    private void RequestAd()
+    {
+        loading = true;
+        rewardedAd.LoadAd();
+        StateChanged?.Invoke();
+    }
+
     public void ShowAd()
     {
-        // Disable the button:
-        _showAdButton.interactable = false;
-        // Then show the ad:
-        Advertisement.Show(_adUnitId, this);
+        if (!IsReady) return;
+        isShowing = true;
+        requestedAd = true;
+        rewardGrantedForRequest = false;
+        StateChanged?.Invoke();
+        rewardedAd.ShowAd(placementName);
     }
 
-    // Implement the Show Listener's OnUnityAdsShowComplete callback method to determine if the user gets a reward:
-    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
+    private void OnAdLoaded(LevelPlayAdInfo info)
     {
-        if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
-        {
-            Debug.Log("Unity Ads Rewarded Ad Completed");
-
-            if (AdRewardManager.Instance != null)
-            {
-                AdRewardManager.Instance.GrantReward();
-            }
-            else
-            {
-                Debug.LogWarning("AdRewardManager not found in scene!");
-            }
-
-            _showAdButton.interactable = true;
-            // Grant a reward.
-        }
-        else
-        {
-            // Ad was skipped or closed
-            Debug.Log("Rewarded ad was not completed.");
-            _showAdButton.interactable = true;
-        }
+        loading = false;
+        retryCount = 0;
+        StateChanged?.Invoke();
     }
 
-    // Implement Load and Show Listener error callbacks:
-    public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
+    private void OnAdLoadFailed(LevelPlayAdError error)
     {
-        Debug.Log($"Error loading Ad Unit {adUnitId}: {error.ToString()} - {message}");
-
-        if (adUnitId.Equals(_adUnitId))
+        loading = false;
+        Debug.LogWarning($"[LevelPlay] Rewarded ad failed to load: {error}", this);
+        if (retryCount < maxRetries && isActiveAndEnabled)
         {
-            if (currentRetryCount < maxRetries)
-            {
-                currentRetryCount++;
-                Debug.Log($"Retrying ad load ({currentRetryCount}/{maxRetries}) after {retryDelay} seconds...");
-                StartCoroutine(RetryLoadAd());
-            }
-            else
-            {
-                Debug.LogError($"Failed to load ad after {maxRetries} attempts. Button will remain disabled.");
-                _showAdButton.interactable = false;
-            }
+            retryCount++;
+            retryRoutine = StartCoroutine(RetryLoadAd());
         }
+        StateChanged?.Invoke();
     }
 
-    /// <summary>
-    /// Coroutine to retry loading the ad after a delay
-    /// </summary>
     private IEnumerator RetryLoadAd()
     {
-        yield return new WaitForSeconds(retryDelay);
-        Debug.Log("Retrying ad load...");
-        Advertisement.Load(_adUnitId, this);
+        yield return new WaitForSecondsRealtime(retryDelay);
+        retryRoutine = null;
+        if (rewardedAd != null && !loading && !isShowing && !pendingReward) RequestAd();
     }
 
-    public void OnUnityAdsShowFailure(string adUnitId, UnityAdsShowError error, string message)
+    private void OnAdDisplayFailed(LevelPlayAdInfo info, LevelPlayAdError error)
     {
-        Debug.Log($"Error showing Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        
-        if (adUnitId.Equals(_adUnitId))
-        {
-            _showAdButton.interactable = true;
-            // Try to load another ad
-            LoadAd();
-        }
-    }
-
-    public void OnUnityAdsShowStart(string adUnitId) { }
-    public void OnUnityAdsShowClick(string adUnitId) { }
-
-    void OnDestroy()
-    {
-        // Clean up the button listeners:
-        _showAdButton.onClick.RemoveAllListeners();
-        StopAllCoroutines();
-    }
-
-    private void OnEnable()
-    {
+        isShowing = false;
+        requestedAd = false;
+        Debug.LogWarning($"[LevelPlay] Rewarded ad failed to show: {error}", this);
+        StateChanged?.Invoke();
         LoadAd();
+    }
+
+    private void OnAdClosed(LevelPlayAdInfo info)
+    {
+        isShowing = false;
+        StateChanged?.Invoke();
+        LoadAd();
+    }
+
+    private void OnAdRewarded(LevelPlayAdInfo info, LevelPlayReward reward)
+    {
+        // LevelPlay may deliver this after OnAdClosed; don't gate it on isShowing.
+        if (!requestedAd || rewardGrantedForRequest) return;
+        rewardGrantedForRequest = true;
+
+        pendingReward = true;
+        SaveReward();
+    }
+
+    private void Update()
+    {
+        if (pendingReward && Time.unscaledTime >= nextRewardRetry) SaveReward();
+    }
+
+    private void SaveReward()
+    {
+        nextRewardRetry = Time.unscaledTime + 5f;
+        PlayerProfileData data = PlayerProfileHolder.Instance != null ? PlayerProfileHolder.Instance.CurrentData : null;
+        if (data == null || LocalSaveStorage.Instance == null)
+        {
+            Debug.LogError("[LevelPlay] Cannot save the meal reward: profile or local storage is unavailable.", this);
+            StateChanged?.Invoke();
+            return;
+        }
+
+        int previousBones = data.FilledMealBones;
+        long previousTime = data.NextMealBoneEmptiesAt;
+        int previousRevision = data.SaveRevision;
+        MealProgress.ClearBones(data);
+        if (!LocalSaveStorage.Instance.Save())
+        {
+            data.FilledMealBones = previousBones;
+            data.NextMealBoneEmptiesAt = previousTime;
+            data.SaveRevision = previousRevision;
+            Debug.LogError("[LevelPlay] Could not save the meal reward; retrying.", this);
+            StateChanged?.Invoke();
+            return;
+        }
+
+        pendingReward = false;
+        _ = ProfileSyncService.SyncSavedProfileAsync();
+        StateChanged?.Invoke();
+        LoadAd();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus) LoadAd();
+    }
+
+    private void OnDestroy()
+    {
+        if (ads != null) ads.Initialized -= OnInitialized;
+        if (rewardedAd == null) return;
+        rewardedAd.OnAdLoaded -= OnAdLoaded;
+        rewardedAd.OnAdLoadFailed -= OnAdLoadFailed;
+        rewardedAd.OnAdDisplayFailed -= OnAdDisplayFailed;
+        rewardedAd.OnAdClosed -= OnAdClosed;
+        rewardedAd.OnAdRewarded -= OnAdRewarded;
+        rewardedAd.DestroyAd();
     }
 }

@@ -10,7 +10,6 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private XPManager xpManager;
     [SerializeField] private CoinManager coinManager;
     [SerializeField] private GameOverScreenUiController gameOverScreen;
-    [SerializeField] private AdRewardManager adRewardManager;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool runHasEnded;
@@ -45,8 +44,16 @@ public class GameOverManager : MonoBehaviour
         bool isNewHighScore = IsNewHighScore(finalScore);
 
         runHasEnded = true;
+        if (TaskProgressManager.Instance != null)
+            TaskProgressManager.Instance.SaveCheckpoint();
         NewRunManager.Instance.CurrentRunScore = finalScore;
         xpManager.TakeScore(finalScore);
+
+        if (PlayerProfileHolder.Instance != null &&
+            MealProgress.CompleteRun(PlayerProfileHolder.Instance.CurrentData, MealProgress.UtcNowSeconds))
+        {
+            _ = ProfileSyncService.SaveAndSyncAsync();
+        }
 
         Time.timeScale = 0f;
 
@@ -99,11 +106,4 @@ public class GameOverManager : MonoBehaviour
         SceneController.Instance.LoadScene(mainMenuSceneName);
     }
 
-    /// <summary>
-    /// Requests an ad-granted reward for the completed run (e.g. bonus coins, revive).
-    /// </summary>
-    public void WatchAdForReward()
-    {
-        adRewardManager?.GrantReward();
-    }
 }

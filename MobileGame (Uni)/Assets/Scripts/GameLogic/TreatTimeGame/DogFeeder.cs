@@ -421,6 +421,7 @@ public class DogFeeder : MonoBehaviour
 
             comboTimer = comboWindow;
 
+            TaskProgressManager.ReportMealFed();
             MealFed?.Invoke(comboAmount);
 
             // Score for this meal scales with the current combo tier and is sent immediately.

@@ -27,6 +27,11 @@ public static class PlayerInventory
         OnChanged?.Invoke(null);
     }
 
+    internal static void NotifyOwnershipChanged()
+    {
+        OnChanged?.Invoke(null);
+    }
+
     /// <summary>Returns the equipped hat id for a slot, or an empty string if none.</summary>
     public static string GetEquippedId(string slotId)
     {

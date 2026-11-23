@@ -11,11 +11,13 @@ public class MainMenuCoinDisplay : MonoBehaviour
     private void OnEnable()
     {
         ShopManager.OnCurrencyChanged += Refresh;
+        TaskProgressManager.Changed += Refresh;
     }
 
     private void OnDisable()
     {
         ShopManager.OnCurrencyChanged -= Refresh;
+        TaskProgressManager.Changed -= Refresh;
     }
 
     /// <summary>

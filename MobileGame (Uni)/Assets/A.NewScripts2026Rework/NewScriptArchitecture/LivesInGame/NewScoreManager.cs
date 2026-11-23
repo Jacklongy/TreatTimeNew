@@ -48,6 +48,7 @@ public class NewScoreManager : MonoBehaviour
         }
 
         CurrentScore += amount;
+        TaskProgressManager.ReportScore(amount);
         RefreshScoreDisplay();
         CheckForMilestones();
         ScoreAdded?.Invoke(amount, comboFeed);

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6503345487833733094}
   - component: {fileID: 3096880159315307466}
+  - component: {fileID: 8180357728679172481}
   m_Layer: 10
   m_Name: YellowHatPrefab
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3141978608223575193}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.0054560006}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -52,7 +53,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -72,9 +73,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1839874113
   m_SortingLayer: 4
-  m_SortingOrder: 9
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.838987, b: 0.3820755, a: 1}
+  m_SortingOrder: 10
+  m_Sprite: {fileID: 21300000, guid: 819336753ca808043bcdb81f618bc0b0, type: 3}
+  m_Color: {r: 0.96470594, g: 0.73333335, b: 0.2627451, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -84,3 +85,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8180357728679172481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141978608223575193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2471e803cfe475b8f0ee4bcffd0e9ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetPlacements:
+  - slotId: chicken
+    localPosition: {x: -0.007, y: -0.087, z: 0.005456001}
+    localEulerAngles: {x: -1.044, y: 0.062, z: -5.102}
+    localScale: {x: 1.048511, y: 0, z: 0}
+  - slotId: egg
+    localPosition: {x: 0.012, y: -0.208, z: 0.005456001}
+    localEulerAngles: {x: 0, y: 0, z: 0}
+    localScale: {x: 1.682577, y: 1.60473, z: 1.60473}

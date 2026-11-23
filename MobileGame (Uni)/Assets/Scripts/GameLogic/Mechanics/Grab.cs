@@ -212,27 +212,7 @@ public class Grab : MonoBehaviour
 
             Item item = currentlyDragging.GetComponent<Item>();
 
-            SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
-
-            if (spriteRenderer != null)
-                spriteRenderer.sortingLayerName = "Dragging";
-
-            foreach (Transform child in currentlyDragging.transform)
-            {
-                SpriteRenderer spriteRendererChild = child.GetComponent<SpriteRenderer>();
-                if (spriteRendererChild != null)
-                    spriteRendererChild.sortingLayerName = "Dragging";
-
-                if (child.childCount > 0)
-                {
-                    foreach (Transform childChild in child.transform)
-                    {
-                        SpriteRenderer spriteRendererChildChild = childChild.GetComponent<SpriteRenderer>();
-                        if (spriteRendererChildChild != null)
-                            spriteRendererChildChild.sortingLayerName = "Dragging";
-                    }
-                }
-            }
+            SetSortingLayerRecursive(currentlyDragging, "Dragging");
 
             if (item.OnGrid == true)
             {
@@ -258,27 +238,7 @@ public class Grab : MonoBehaviour
             dog.SetBool("Hovering", false);
 
             // Change Sorting Layer Back just to foreground and not dragging.
-            SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
-
-            if (spriteRenderer != null)
-                spriteRenderer.sortingLayerName = "foreGround";
-
-            foreach (Transform child in currentlyDragging.transform)
-            {
-                SpriteRenderer spriteRendererChild = child.GetComponent<SpriteRenderer>();
-                if (spriteRendererChild != null)
-                    spriteRendererChild.sortingLayerName = "foreGround";
-
-                if(child.childCount > 0)
-                {
-                    foreach (Transform childChild in child.transform)
-                    {
-                        SpriteRenderer spriteRendererChildChild = childChild.GetComponent<SpriteRenderer>();
-                        if (spriteRendererChildChild != null)
-                            spriteRendererChildChild.sortingLayerName = "foreGround";
-                    }
-                }
-            }
+            SetSortingLayerRecursive(currentlyDragging, "foreGround");
 
 
 
@@ -471,6 +431,14 @@ public class Grab : MonoBehaviour
         Clear();
     }
 
+    private static void SetSortingLayerRecursive(GameObject root, string layerName)
+    {
+        foreach (SpriteRenderer spriteRenderer in root.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            spriteRenderer.sortingLayerName = layerName;
+        }
+    }
+
     /// <summary>
     /// Cancelled grab, so if finger is dragged of screen etc.
     /// </summary>
@@ -478,9 +446,7 @@ public class Grab : MonoBehaviour
     {
         if (currentlyDragging != null)
         {
-            SpriteRenderer spriteRenderer = currentlyDragging.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
-                spriteRenderer.sortingLayerName = "foreGround";
+            SetSortingLayerRecursive(currentlyDragging, "foreGround");
 
             // Snap back to nearest empty tile (old slot system removed)
             SnapBackToTile();
@@ -513,7 +479,13 @@ public class Grab : MonoBehaviour
 
         // Perform the merge (this Instantiates the next item and Destroys the target)
         Item merge = New.GetComponent<Item>();
+        string mergedTag = New.tag;
+        Bowl bowl = merge as Bowl;
+        bool canMerge = bowl == null || New.CompareTag("Red") ||
+                        (bowl.NextBowl != null && bowl.ItemInBowl == null);
         merge.Merge(New);
+        if (canMerge)
+            TaskProgressManager.ReportMerge(mergedTag);
         Destroy(currentlyDragging);
 
         // Wait a frame for physics to register the new item, then place it on the tile

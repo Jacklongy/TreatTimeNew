@@ -146,7 +146,10 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: -6028330522677802574, guid: 4f80e355779fa69479a5d5f8f3bb2383, type: 2}
+  - {fileID: 11400000, guid: 61a323178b240944f863a527340cba58, type: 2}
+  - {fileID: 11400000, guid: a5b3c70072c6c554483cfdd082fde528, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -167,7 +170,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.LongyDev.TreatTime
+    Android: com.LongmoreGamesStudio.TreatTime
     Standalone: com.Longy-Dev.TreatTime
   buildNumber:
     Standalone: 0
@@ -775,7 +778,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: UNITY_POST_PROCESSING_STACK_V2
+    Android: UNITY_POST_PROCESSING_STACK_V2;LEVELPLAY_DEPENDENCIES_INSTALLED
     EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2
     Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2

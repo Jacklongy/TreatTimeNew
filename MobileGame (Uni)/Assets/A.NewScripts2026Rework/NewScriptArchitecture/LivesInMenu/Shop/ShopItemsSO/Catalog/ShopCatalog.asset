@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: ShopCatalog
   m_EditorClassIdentifier: 
   dogHats: []
-  itemHats:
+  hats:
   - {fileID: 11400000, guid: aafbb8f04aeca4d4886eabd2ac670f74, type: 2}
   - {fileID: 11400000, guid: 2fdc85a587a33b5419b5d24a91afffb9, type: 2}
+  - {fileID: 11400000, guid: 861eefa572123a945998b24ab38bd888, type: 2}
+  requiredLevelByRarity: 0000000014000000280000003c000000

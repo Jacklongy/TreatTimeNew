@@ -1,47 +1,107 @@
+using System;
+using Unity.Services.LevelPlay;
 using UnityEngine;
-using UnityEngine.Advertisements;
 
-public class Ads : MonoBehaviour, IUnityAdsInitializationListener
+/// <summary>Initializes LevelPlay once and reports when it is ready.</summary>
+public class Ads : MonoBehaviour
 {
-    [SerializeField] string _androidGameId;
-    [SerializeField] string _iOSGameId;
-    [SerializeField] bool _testMode = true;
-    private string _gameId;
+    [SerializeField] private string androidAppKey;
+    [SerializeField] private string iosAppKey;
+    [SerializeField] private bool enableTestSuite;
 
-    [SerializeField] RewardedAdsButton rewarded;
+    public static Ads Instance { get; private set; }
+    public bool IsReady { get; private set; }
+    public event Action Initialized;
 
-    void Awake()
+    private bool initializing;
+
+    private void Awake()
     {
-        InitializeAds();
-    }
-
-   
-
-    public void InitializeAds()
-    {
-#if UNITY_IOS
-            _gameId = _iOSGameId;
-#elif UNITY_ANDROID
-        _gameId = _androidGameId;
-#elif UNITY_EDITOR
-            _gameId = _androidGameId; //Only for testing the functionality in the Editor
-#endif
-        if (!Advertisement.isInitialized && Advertisement.isSupported)
+        if (Instance != null && Instance != this)
         {
-            Advertisement.Initialize(_gameId, _testMode, this);
+            enabled = false;
+            return;
         }
+
+        if (transform.parent != null)
+        {
+            Debug.LogError("[LevelPlay] Put the Ads components on a separate root object.", this);
+            enabled = false;
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        LevelPlay.OnInitSuccess += OnInitialized;
+        LevelPlay.OnInitFailed += OnInitializationFailed;
     }
 
-
-    public void OnInitializationComplete()
+    private void Start()
     {
-        Debug.Log("Unity Ads initialization complete.");
-
-        rewarded.LoadAd();
+        Initialize();
     }
 
-    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
+    public void Initialize()
     {
-        Debug.Log($"Unity Ads Initialization Failed: {error.ToString()} - {message}");
+        if (Instance != this || initializing || IsReady) return;
+
+#if UNITY_IOS && !UNITY_EDITOR
+        string appKey = iosAppKey;
+#else
+        string appKey = androidAppKey;
+#endif
+        if (string.IsNullOrWhiteSpace(appKey))
+        {
+            Debug.LogError("[LevelPlay] Set the App Key for this platform.", this);
+            return;
+        }
+
+        initializing = true;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (enableTestSuite) LevelPlay.SetMetaData("is_test_suite", "enable");
+#endif
+        LevelPlay.Init(appKey);
+    }
+
+    /// <summary>Open the LevelPlay integration suite in an editor or development build.</summary>
+    public void LaunchTestSuite()
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (!enableTestSuite || !IsReady)
+        {
+            Debug.LogWarning("[LevelPlay] Enable the test suite and wait for initialization first.", this);
+            return;
+        }
+        LevelPlay.LaunchTestSuite();
+#else
+        Debug.LogWarning("[LevelPlay] The test suite is only available in development builds.", this);
+#endif
+    }
+
+    private void OnInitialized(LevelPlayConfiguration configuration)
+    {
+        initializing = false;
+        IsReady = true;
+        Debug.Log("[LevelPlay] Initialization succeeded.");
+        Initialized?.Invoke();
+    }
+
+    private void OnInitializationFailed(LevelPlayInitError error)
+    {
+        initializing = false;
+        Debug.LogWarning($"[LevelPlay] Initialization failed: {error}", this);
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus && !IsReady) Initialize();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        LevelPlay.OnInitSuccess -= OnInitialized;
+        LevelPlay.OnInitFailed -= OnInitializationFailed;
+        Instance = null;
     }
 }

@@ -214,6 +214,12 @@ public static class ProfileSyncService
             return false;
         }
 
+        return await SyncSavedProfileAsync();
+    }
+
+    /// <summary>Syncs a profile that has already been saved locally.</summary>
+    public static async Task<bool> SyncSavedProfileAsync()
+    {
         if (CloudSyncDisabledForSession)
         {
             return false;

@@ -11,6 +11,48 @@ public struct EquippedSlot
     public string ItemId;
 }
 
+[Serializable]
+public class TaskMergeCount
+{
+    public string ItemTag;
+    public long Count;
+}
+
+[Serializable]
+public class TaskStatistics
+{
+    public long MealsFed;
+    public long ScoreEarned;
+    public List<TaskMergeCount> MergeCounts = new List<TaskMergeCount>();
+}
+
+[Serializable]
+public class SavedTaskProgress
+{
+    public string TaskId;
+    public int Progress;
+    public bool Claimed;
+}
+
+[Serializable]
+public class SavedTaskBonus
+{
+    public TaskRewardType Type;
+    public int Amount;
+    public string ItemId;
+    public string ItemName;
+    public bool Claimed;
+}
+
+[Serializable]
+public class SavedTaskPeriod
+{
+    public TaskTime Period;
+    public string PeriodKey;
+    public List<SavedTaskProgress> Tasks = new List<SavedTaskProgress>();
+    public SavedTaskBonus Bonus;
+}
+
 /// <summary>
 /// Serializable local player data. It contains values only; managers and save services own the behavior.
 /// </summary>
@@ -33,6 +75,10 @@ public class PlayerProfileData
     public bool HasPlayed;
     public bool VibrationsEnabled;
 
+    // Filled bones empty one at a time; timestamp is UTC Unix seconds.
+    public int FilledMealBones;
+    public long NextMealBoneEmptiesAt;
+
     // Sync bookkeeping, used instead of device clocks. Bumped on every local save.
     public int SaveRevision;
     // Last revision known to be stored in the cloud. SaveRevision > SyncedRevision means unsynced changes.
@@ -43,6 +89,9 @@ public class PlayerProfileData
     // Shop state. Items are referenced by ShopItemData.Id.
     public List<string> PurchasedItemIds;
     public List<EquippedSlot> EquippedSlots;
+
+    public TaskStatistics TaskStatistics = new TaskStatistics();
+    public List<SavedTaskPeriod> TaskPeriods = new List<SavedTaskPeriod>();
 
     public PlayerProfileData()
     {

@@ -15,6 +15,7 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
 {
     [SerializeField] private MainMenuXPDisplay xpDisplay;
     [SerializeField] private MainMenuCoinDisplay coinDisplay;
+    [SerializeField] private MainMealManagerHome mealManager;
 
     [SerializeField] private TextMeshProUGUI PlayerNameText;
     [SerializeField] private TextMeshProUGUI DogNameText;
@@ -39,8 +40,12 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
             Debug.Log("No save file found. Created default data.");
         }
 
+        if (TaskProgressManager.Instance != null)
+            TaskProgressManager.Instance.Initialize();
+
         xpDisplay?.Refresh();
         coinDisplay?.Refresh();
+        mealManager?.Initialize();
 
         if (PlayerNameText != null)
         {
@@ -60,6 +65,9 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
     public void StartGame()
     {
         if (PlayerProfileHolder.Instance == null)
+            return;
+
+        if (mealManager != null && !mealManager.TryStartRun())
             return;
 
         PlayerProfileHolder.Instance.CurrentData.HasPlayed = true;

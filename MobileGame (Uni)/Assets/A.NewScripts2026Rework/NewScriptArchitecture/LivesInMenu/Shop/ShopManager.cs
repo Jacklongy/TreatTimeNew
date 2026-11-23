@@ -119,7 +119,7 @@ public class ShopManager : MonoBehaviour
         }
 
         PlayerInventory.AddOwned(item);
-        // Auto-equip on the current target, saving once below. Skipped if the hat doesn't fit that target.
+        // Auto-equip on the current target, saving once below.
         wardrobe.TryEquip(SelectedSlotId, item, false);
 
         _ = ProfileSyncService.SaveAndSyncAsync();
@@ -132,7 +132,7 @@ public class ShopManager : MonoBehaviour
         HatSlot slot = previewController.CurrentHatSlot;
         if (slot == null) return;
 
-        if (item != null && Wardrobe.FitsSlot(slot.SlotId, item)) slot.ShowPreview(item);
+        if (item != null) slot.ShowPreview(item);
         else slot.ShowSavedHat();
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Goes on a wardrobe page (Items or Dog). Spawns a slot for every owned hat in its category,
+/// Goes on the shared wardrobe page. Spawns a slot for every owned hat in the catalog,
 /// adding new ones when hats are bought. Slots are never removed because hats can't be lost.
 /// </summary>
 public class WardrobeGrid : MonoBehaviour
@@ -10,7 +10,6 @@ public class WardrobeGrid : MonoBehaviour
     [SerializeField] private ShopManager shopManager;
     [SerializeField] private Wardrobe wardrobe;
     [SerializeField] private ShopCatalog catalog;
-    [SerializeField] private ItemCategory category;
     [SerializeField] private WardrobeSlotUI slotPrefab;
     [Tooltip("Parent of the spawned slots, e.g. the object with the Grid Layout Group.")]
     [SerializeField] private Transform slotParent;
@@ -32,7 +31,7 @@ public class WardrobeGrid : MonoBehaviour
 
     private void AddMissingSlots()
     {
-        foreach (ShopItemData hat in catalog.GetByCategory(category))
+        foreach (ShopItemData hat in catalog.Hats)
         {
             if (hat == null || !PlayerInventory.IsOwned(hat) || spawned.ContainsKey(hat.Id)) continue;
 

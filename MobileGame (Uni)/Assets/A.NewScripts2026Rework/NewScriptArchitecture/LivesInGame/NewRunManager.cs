@@ -29,6 +29,10 @@ public class NewRunManager : MonoBehaviour
         }
 
         LoadProfileIntoGameRun();
+        if (TaskProgressManager.Instance != null)
+            TaskProgressManager.Instance.StartRun();
+        else
+            Debug.LogError("TaskProgressManager is missing; task progress will not be recorded.");
 
         // Play Game Music 
         FindObjectOfType<SoundManagerScript>().StopPlaying("LobbyMusic");

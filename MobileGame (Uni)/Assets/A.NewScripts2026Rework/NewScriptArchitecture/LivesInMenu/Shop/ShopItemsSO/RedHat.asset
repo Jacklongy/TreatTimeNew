@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: RedHat
   displayName: Red Hat
-  icon: {fileID: 7482667652216324306, guid: 0dd1514421c4e034299c3edc203d5c70, type: 3}
-  category: 1
+  icon: {fileID: 21300000, guid: 6728921257e57c341b8783d598ab1a84, type: 3}
   rarity: 0
   currency: 0
-  price: 1
+  price: 10
   hatPrefab: {fileID: 3141978608223575193, guid: 8bae9b097bb96ff42b8b5d1fa6836190, type: 3}

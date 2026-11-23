@@ -14,7 +14,6 @@ public class ShopItemData : ScriptableObject
     [SerializeField] private Sprite icon;
 
     [Header("Shop")]
-    [SerializeField] private ItemCategory category;
     [SerializeField] private ItemRarity rarity;
     [SerializeField] private CurrencyType currency;
     [Min(0)] [SerializeField] private int price;
@@ -26,7 +25,6 @@ public class ShopItemData : ScriptableObject
     public string Id => id;
     public string DisplayName => displayName;
     public Sprite Icon => icon;
-    public ItemCategory Category => category;
     public ItemRarity Rarity => rarity;
     public CurrencyType Currency => currency;
     public int Price => price;

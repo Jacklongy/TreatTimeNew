@@ -1,8 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Switches between the shop and wardrobe pages. Each section has an Items page and a Dog page,
-/// chosen by whichever target is selected in the preview.
+/// Switches between the shared shop and wardrobe pages.
 /// </summary>
 public class ShopNavigation : MonoBehaviour
 {
@@ -10,25 +9,12 @@ public class ShopNavigation : MonoBehaviour
 
     [SerializeField] private ShopManager shopManager;
 
-    [Header("Shop pages")]
+    [Header("Shared pages")]
     [SerializeField] private GameObject shopItemsPage;
-    [SerializeField] private GameObject shopDogPage;
-
-    [Header("Wardrobe pages")]
     [SerializeField] private GameObject wardrobeItemsPage;
-    [SerializeField] private GameObject wardrobeDogPage;
 
-    private Section section = Section.None;
-
-    private void OnEnable()
-    {
-        shopManager.OnTargetChanged += HandleTargetChanged;
-    }
-
-    private void OnDisable()
-    {
-        shopManager.OnTargetChanged -= HandleTargetChanged;
-    }
+    [HideInInspector, SerializeField] private GameObject shopDogPage;
+    [HideInInspector, SerializeField] private GameObject wardrobeDogPage;
 
     /// <summary>Hook to the Shop tab button.</summary>
     public void OpenShop() => Open(Section.Shop);
@@ -41,26 +27,12 @@ public class ShopNavigation : MonoBehaviour
 
     private void Open(Section next)
     {
-        section = next;
-        ShowPages();
-    }
-
-    private void HandleTargetChanged(string _)
-    {
-        if (section != Section.None) ShowPages();
-    }
-
-    private void ShowPages()
-    {
-        // An unsaved preview must not carry over to another page.
         shopManager.ClearPreview();
 
-        bool dog = shopManager.SelectedSlotId == Wardrobe.DogSlotId;
-
-        SetActive(shopItemsPage, section == Section.Shop && !dog);
-        SetActive(shopDogPage, section == Section.Shop && dog);
-        SetActive(wardrobeItemsPage, section == Section.Wardrobe && !dog);
-        SetActive(wardrobeDogPage, section == Section.Wardrobe && dog);
+        SetActive(shopItemsPage, next == Section.Shop);
+        SetActive(wardrobeItemsPage, next == Section.Wardrobe);
+        SetActive(shopDogPage, false);
+        SetActive(wardrobeDogPage, false);
     }
 
     private static void SetActive(GameObject page, bool active)

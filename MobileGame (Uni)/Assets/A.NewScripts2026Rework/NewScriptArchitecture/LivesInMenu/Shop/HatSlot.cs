@@ -57,5 +57,9 @@ public class HatSlot : MonoBehaviour
 
         currentHat = Instantiate(item.HatPrefab, hatAnchor);
         currentHat.transform.localPosition = Vector3.zero;
+        HatPlacement placement = currentHat.GetComponent<HatPlacement>();
+        if (placement != null) placement.Apply(slotId);
+        HatVariants variants = currentHat.GetComponent<HatVariants>();
+        if (variants != null) variants.Apply(slotId);
     }
 }
