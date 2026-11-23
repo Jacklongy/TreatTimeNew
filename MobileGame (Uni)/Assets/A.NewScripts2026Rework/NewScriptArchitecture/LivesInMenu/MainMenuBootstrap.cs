@@ -26,6 +26,15 @@ public class MainMenuBootstrap : MonoBehaviour // Checks the data exists before 
     /// </summary>
     private void Start()
     {
+        if (SoundManagerScript.instance != null)
+        {
+            SoundManagerScript.instance.PlayLobbyMusic();
+        }
+        else
+        {
+            Debug.LogError("[MainMenu] SoundManagerScript is missing; lobby music cannot play.");
+        }
+
         if (PlayerProfileHolder.Instance == null)
         {
             Debug.LogError("PlayerProfileHolder is missing from the scene.");

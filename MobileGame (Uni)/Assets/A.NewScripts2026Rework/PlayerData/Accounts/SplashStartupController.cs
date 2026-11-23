@@ -72,6 +72,15 @@ public class SplashStartupController : MonoBehaviour
     {
         try
         {
+            if (SoundManagerScript.instance != null)
+            {
+                SoundManagerScript.instance.PlayLobbyMusic();
+            }
+            else
+            {
+                Debug.LogError("[Splash] SoundManagerScript is missing; lobby music cannot play.");
+            }
+
             await RunStartupAsync();
         }
         catch (Exception exception)

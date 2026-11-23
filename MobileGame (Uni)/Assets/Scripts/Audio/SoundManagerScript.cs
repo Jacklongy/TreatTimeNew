@@ -50,7 +50,7 @@ public class SoundManagerScript : MonoBehaviour
 
         if (s == null)
         {
-            Debug.Log("name of sound wrong");
+            Debug.LogError($"[SoundManager] Sound '{name}' is not configured.", this);
 
             return;
         }
@@ -71,6 +71,23 @@ public class SoundManagerScript : MonoBehaviour
         s.source.Play();
     }
 
+    /// <summary>Play lobby music without restarting it when moving from splash to menu.</summary>
+    public void PlayLobbyMusic()
+    {
+        Sound lobbyMusic = Array.Find(sounds, sound => sound.name == "LobbyMusic");
+        if (lobbyMusic == null)
+        {
+            Debug.LogError("[SoundManager] Sound 'LobbyMusic' is not configured.", this);
+            return;
+        }
+
+        StopPlaying("Treat Time Music");
+        if (!lobbyMusic.source.isPlaying)
+        {
+            Play("LobbyMusic");
+        }
+    }
+
 
     /// <summary>
     /// Stop playing to control sounds that are looping.
@@ -82,7 +99,7 @@ public class SoundManagerScript : MonoBehaviour
 
         if (s == null)
         {
-            Debug.Log("name of sound wrong");
+            Debug.LogError($"[SoundManager] Sound '{name}' is not configured.", this);
 
             return;
         }
