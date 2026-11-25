@@ -45,6 +45,11 @@ public class WardrobeGrid : MonoBehaviour
     public void RemoveHat()
     {
         string slotId = shopManager.SelectedSlotId;
-        if (!string.IsNullOrEmpty(slotId)) wardrobe.Unequip(slotId);
+        if (!string.IsNullOrEmpty(slotId))
+        {
+            bool hadHat = !string.IsNullOrEmpty(PlayerInventory.GetEquippedId(slotId));
+            wardrobe.Unequip(slotId);
+            if (hadHat) shopManager.PlaySound(ShopSound.Unequip);
+        }
     }
 }

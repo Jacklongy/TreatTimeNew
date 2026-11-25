@@ -15,11 +15,22 @@ public enum ShopItemState { Locked, Available, Owned }
 
 public enum PurchaseResult { Success, NothingSelected, Locked, AlreadyOwned, NotEnoughCurrency, NoProfile }
 
+public enum ShopSound { Preview, Locked, Purchase, CantAfford, Equip, Unequip }
+
 public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopCatalog catalog;
     [SerializeField] private Wardrobe wardrobe;
     [SerializeField] private ShopPreviewController previewController;
+
+    [Header("Shop Sounds (optional)")]
+    [Tooltip("Exact names from the splash scene's AudioManager. Leave blank to disable a sound.")]
+    [SerializeField] private string previewSound;
+    [SerializeField] private string lockedSound;
+    [SerializeField] private string purchaseSound;
+    [SerializeField] private string cantAffordSound;
+    [SerializeField] private string equipSound;
+    [SerializeField] private string unequipSound;
 
     public static event Action OnCurrencyChanged;
     public event Action<ShopItemData> OnSelectionChanged;
@@ -27,6 +38,33 @@ public class ShopManager : MonoBehaviour
     public event Action<ShopItemData, PurchaseResult> OnPurchaseAttempted;
 
     public ShopItemData SelectedItem { get; private set; }
+
+    public void PlaySound(ShopSound sound)
+    {
+        string soundName;
+        switch (sound)
+        {
+            case ShopSound.Preview: soundName = previewSound; break;
+            case ShopSound.Locked: soundName = lockedSound; break;
+            case ShopSound.Purchase: soundName = purchaseSound; break;
+            case ShopSound.CantAfford: soundName = cantAffordSound; break;
+            case ShopSound.Equip: soundName = equipSound; break;
+            case ShopSound.Unequip: soundName = unequipSound; break;
+            default:
+                Debug.LogError($"[ShopManager] Unknown shop sound: {sound}.", this);
+                return;
+        }
+
+        if (string.IsNullOrWhiteSpace(soundName)) return;
+
+        if (SoundManagerScript.instance == null)
+        {
+            Debug.LogError($"[ShopManager] SoundManagerScript is missing; cannot play '{soundName}'.", this);
+            return;
+        }
+
+        SoundManagerScript.instance.Play(soundName);
+    }
 
     /// <summary>The slot id of whatever is currently shown in the preview (egg, chicken, dog...).</summary>
     public string SelectedSlotId

@@ -71,7 +71,15 @@ public class ShopSlotUI : MonoBehaviour
         if (shopManager.SelectedItem != item)
         {
             shopManager.SelectItem(item);
-            if (shopManager.GetState(item) == ShopItemState.Locked) Play(LockedHash);
+            if (shopManager.GetState(item) == ShopItemState.Locked)
+            {
+                Play(LockedHash);
+                shopManager.PlaySound(ShopSound.Locked);
+            }
+            else
+            {
+                shopManager.PlaySound(ShopSound.Preview);
+            }
             return;
         }
 
@@ -79,14 +87,27 @@ public class ShopSlotUI : MonoBehaviour
         {
             case ShopItemState.Locked:
                 Play(LockedHash);
+                shopManager.PlaySound(ShopSound.Locked);
                 break;
             case ShopItemState.Owned:
-                if (shopManager.TryEquipSelected()) Play(EquippedHash);
+                if (shopManager.TryEquipSelected())
+                {
+                    Play(EquippedHash);
+                    shopManager.PlaySound(ShopSound.Equip);
+                }
                 break;
             default:
                 PurchaseResult result = shopManager.TryBuySelected();
-                if (result == PurchaseResult.Success) Play(SuccessHash);
-                else if (result == PurchaseResult.NotEnoughCurrency) Play(CantAffordHash);
+                if (result == PurchaseResult.Success)
+                {
+                    Play(SuccessHash);
+                    shopManager.PlaySound(ShopSound.Purchase);
+                }
+                else if (result == PurchaseResult.NotEnoughCurrency)
+                {
+                    Play(CantAffordHash);
+                    shopManager.PlaySound(ShopSound.CantAfford);
+                }
                 break;
         }
     }

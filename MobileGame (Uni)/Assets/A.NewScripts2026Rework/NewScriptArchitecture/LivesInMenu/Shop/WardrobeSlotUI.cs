@@ -93,12 +93,14 @@ public class WardrobeSlotUI : MonoBehaviour
         if (shopManager.SelectedItem != item)
         {
             shopManager.SelectItem(item);
+            shopManager.PlaySound(ShopSound.Preview);
             return;
         }
 
-        if (wardrobe.TryEquip(shopManager.SelectedSlotId, item) && animator != null)
+        if (wardrobe.TryEquip(shopManager.SelectedSlotId, item))
         {
-            animator.SetTrigger(EquippedHash);
+            if (animator != null) animator.SetTrigger(EquippedHash);
+            shopManager.PlaySound(ShopSound.Equip);
         }
     }
 

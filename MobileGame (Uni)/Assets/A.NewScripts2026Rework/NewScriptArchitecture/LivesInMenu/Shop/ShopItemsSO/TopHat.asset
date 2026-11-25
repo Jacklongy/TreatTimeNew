@@ -15,7 +15,7 @@ MonoBehaviour:
   id: topHat
   displayName: Top Hat
   icon: {fileID: 21300000, guid: 76d51ee55d84da54dafea7b4729f2b9f, type: 3}
-  rarity: 0
+  rarity: 1
   currency: 0
-  price: 50
+  price: 60
   hatPrefab: {fileID: 3141978608223575193, guid: fe06440716bd45246b22b58ed0150fdc, type: 3}

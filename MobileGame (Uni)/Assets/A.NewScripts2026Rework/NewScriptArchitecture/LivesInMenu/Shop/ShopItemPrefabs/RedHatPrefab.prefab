@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6503345487833733094}
   - component: {fileID: 3096880159315307466}
   - component: {fileID: 8180357728679172481}
-  - component: {fileID: 654653370787917000}
   m_Layer: 10
   m_Name: RedHatPrefab
   m_TagString: Untagged
@@ -75,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 1839874113
   m_SortingLayer: 4
   m_SortingOrder: 9
-  m_Sprite: {fileID: 21300000, guid: 6728921257e57c341b8783d598ab1a84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 11e6e0443c7f28649900255cb8fd539c, type: 3}
   m_Color: {r: 1, g: 0.36320752, b: 0.36320752, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -100,24 +99,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetPlacements:
   - slotId: egg
-    localPosition: {x: 0.016, y: 0.016, z: 0.005456001}
+    localPosition: {x: 0.021, y: 0, z: 0.005456001}
     localEulerAngles: {x: 0, y: 0, z: 0}
-    localScale: {x: 1.765833, y: 1.765833, z: 1.765833}
+    localScale: {x: 1.9503, y: 1.7336, z: 1.765833}
   - slotId: dog
     localPosition: {x: 0, y: 0.0551, z: 0.005456001}
     localEulerAngles: {x: 0, y: 0, z: 0}
     localScale: {x: 4.802601, y: 3.264323, z: 4.886589}
---- !u!114 &654653370787917000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3141978608223575193}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 558623f8e9ae42d6ac6cc4312c09f8cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalHat: {fileID: 0}
-  dogHat: {fileID: 0}
+  - slotId: chicken
+    localPosition: {x: 0, y: 0, z: 0.005456001}
+    localEulerAngles: {x: 0, y: 0, z: 0}
+    localScale: {x: 1.154219, y: 1, z: 1}
+  - slotId: cow
+    localPosition: {x: 0.063, y: 0.029, z: 0.005456001}
+    localEulerAngles: {x: 0, y: 0, z: 0}
+    localScale: {x: 3.164179, y: 1.932438, z: 1}
